@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mindcloud-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "/Users/francescoliso/Desktop/mindcloud-web"],
+      "port": 3000
+    }
+  ]
+}
