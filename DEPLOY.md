@@ -1,9 +1,21 @@
 # Deploying MindCloud to Vercel
 
-Prerequisites: a Vercel account, and the CLI logged in (`vercel login`).
+Repo: https://github.com/francescoliso/mindcloud-web (private)
 
-## 1. Link the project
-From `~/Desktop/mindcloud-web`:
+## Recommended: GitHub auto-deploy
+1. Go to **vercel.com → Add New… → Project → Import Git Repository**.
+2. Select **`francescoliso/mindcloud-web`** (authorize Vercel's GitHub app if asked).
+3. Framework is auto-detected as **Next.js** — leave build settings default
+   (Vercel runs the `vercel-build` script: `prisma generate && next build`).
+4. **Before clicking Deploy**, set the env vars (step 3 below) and create the
+   database (step 2). After that, every push to `main` deploys automatically.
+
+Then do steps 2–4, and step 5 once to create the tables.
+
+---
+
+## Alternative: Vercel CLI
+Prerequisites: `vercel login`, then from `~/Desktop/mindcloud-web`:
 ```bash
 vercel link
 ```
