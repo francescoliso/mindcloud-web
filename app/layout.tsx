@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -15,6 +15,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MindCloud",
   description: "A private journal and gratitude log with weekly AI reflections.",
+  appleWebApp: {
+    capable: true,
+    title: "MindCloud",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0284c7",
 };
 
 export default function RootLayout({
