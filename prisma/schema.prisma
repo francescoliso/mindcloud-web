@@ -15,6 +15,7 @@ model User {
   journalEntries JournalEntry[]
   gratitudeItems GratitudeItem[]
   weeklyReports  WeeklyReport[]
+  moodEntries    MoodEntry[]
 }
 
 model JournalEntry {
@@ -37,6 +38,18 @@ model GratitudeItem {
   createdAt DateTime @default(now())
 
   @@unique([userId, entryDate, position])
+}
+
+model MoodEntry {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score     Int // 1 (struggling) … 5 (great)
+  entryDate DateTime @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, entryDate])
 }
 
 model WeeklyReport {

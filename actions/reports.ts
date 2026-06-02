@@ -17,7 +17,7 @@ export async function generateReport(
   const weekStartDate = localDateOnlyUTC(monday); // key for the @db.Date column
 
   try {
-    const [entries, gratitude] = await Promise.all([
+    const [entries, gratitude, moods] = await Promise.all([
       prisma.journalEntry.findMany({
         where: { userId, createdAt: { gte: monday } },
         orderBy: { createdAt: "asc" },
@@ -26,11 +26,16 @@ export async function generateReport(
         where: { userId, entryDate: { gte: weekStartDate } },
         orderBy: [{ entryDate: "asc" }, { position: "asc" }],
       }),
+      prisma.moodEntry.findMany({
+        where: { userId, entryDate: { gte: weekStartDate } },
+        orderBy: { entryDate: "asc" },
+      }),
     ]);
 
     const prompt = weeklyReportPrompt(
       entries.map((e) => ({ content: e.content, createdAt: e.createdAt })),
       gratitude.map((g) => ({ content: g.content })),
+      moods.map((m) => ({ score: m.score, entryDate: m.entryDate })),
     );
     const content = await completeWeeklyReport(prompt);
 

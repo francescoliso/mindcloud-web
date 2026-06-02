@@ -1,15 +1,23 @@
 import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
 import { JournalComposer } from "@/components/journal-composer";
+import { MoodCheckin } from "@/components/mood-checkin";
 import { deleteJournalEntry } from "@/actions/journal";
 import { formatDateTime } from "@/lib/format";
+import { localDateOnlyUTC } from "@/lib/week";
 
 export default async function JournalPage() {
   const userId = await requireUserId();
-  const entries = await prisma.journalEntry.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
-  });
+  const today = localDateOnlyUTC();
+  const [entries, todayMood] = await Promise.all([
+    prisma.journalEntry.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.moodEntry.findUnique({
+      where: { userId_entryDate: { userId, entryDate: today } },
+    }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -17,6 +25,8 @@ export default async function JournalPage() {
         <h1 className="text-xl font-semibold tracking-tight">Today&apos;s Journal</h1>
         <p className="text-sm text-neutral-500">Write down what&apos;s on your mind.</p>
       </section>
+
+      <MoodCheckin initial={todayMood?.score ?? null} />
 
       <JournalComposer />
 
