@@ -1,10 +1,17 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireUserId } from "@/lib/session";
+import { prisma } from "@/lib/db";
 import { signOut } from "@/auth";
 import { NavTabs } from "@/components/nav-tabs";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  await requireUserId();
+  const userId = await requireUserId();
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { onboardedAt: true },
+  });
+  if (!user?.onboardedAt) redirect("/welcome");
 
   async function doSignOut() {
     "use server";

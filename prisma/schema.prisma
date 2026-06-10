@@ -12,10 +12,27 @@ model User {
   email          String          @unique
   passwordHash   String
   createdAt      DateTime        @default(now())
+  onboardedAt    DateTime?
   journalEntries JournalEntry[]
   gratitudeItems GratitudeItem[]
   weeklyReports  WeeklyReport[]
   moodEntries    MoodEntry[]
+}
+
+enum WaitlistStatus {
+  PENDING
+  INVITED
+  REGISTERED
+}
+
+model WaitlistEntry {
+  id             String         @id @default(uuid()) @db.Uuid
+  email          String         @unique
+  status         WaitlistStatus @default(PENDING)
+  inviteToken    String?        @unique
+  invitedAt      DateTime?
+  tokenExpiresAt DateTime?
+  createdAt      DateTime       @default(now())
 }
 
 model JournalEntry {

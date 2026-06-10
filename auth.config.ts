@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 
-const APP_ROUTES = ["/journal", "/gratitude", "/reports"];
+const APP_ROUTES = ["/journal", "/gratitude", "/reports", "/welcome", "/admin"];
 
 // Edge-safe config (no bcrypt / Prisma) — shared by middleware and the full
 // auth instance. The Credentials provider is added in auth.ts (Node runtime).
@@ -22,11 +22,17 @@ export const authConfig = {
       return true;
     },
     jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+      }
       return token;
     },
     session({ session, token }) {
-      if (token.id && session.user) session.user.id = token.id as string;
+      if (session.user) {
+        if (token.id) session.user.id = token.id as string;
+        if (token.email) session.user.email = token.email as string;
+      }
       return session;
     },
   },
