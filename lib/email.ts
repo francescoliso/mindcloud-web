@@ -1,23 +1,27 @@
 import "server-only";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const FROM = process.env.EMAIL_FROM ?? "MindCloud <onboarding@resend.dev>";
-const API_KEY = process.env.RESEND_API_KEY;
+const USER = process.env.GMAIL_USER;
+const PASS = process.env.GMAIL_APP_PASSWORD?.replace(/\s/g, ""); // app passwords are shown with spaces
+const FROM = process.env.EMAIL_FROM ?? (USER ? `MindCloud <${USER}>` : "MindCloud");
 
-// Sends an email via Resend. If no API key is configured (local dev, or before
-// email is set up), it logs the message instead of throwing — so the app keeps
-// working and the invite link is still recoverable from the server logs.
+// Sends via Gmail SMTP (free, no domain needed). If credentials are missing
+// (local dev, or before setup), it logs the message instead of throwing — so
+// the app keeps working and invite links stay recoverable from the logs / the
+// admin page's copyable link.
 async function send(to: string, subject: string, html: string): Promise<void> {
-  if (!API_KEY) {
+  if (!USER || !PASS) {
     console.log(`[email:dev] to=${to} subject="${subject}"\n${html}\n`);
     return;
   }
   try {
-    const resend = new Resend(API_KEY);
-    const { error } = await resend.emails.send({ from: FROM, to, subject, html });
-    if (error) console.error("[email] send failed:", error);
+    const transport = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: USER, pass: PASS },
+    });
+    await transport.sendMail({ from: FROM, to, subject, html });
   } catch (err) {
-    console.error("[email] send threw:", err);
+    console.error("[email] send failed:", err);
   }
 }
 
