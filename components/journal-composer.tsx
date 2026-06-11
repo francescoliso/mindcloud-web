@@ -36,7 +36,12 @@ export function JournalComposer() {
         placeholder="What's on your mind today?"
         className="w-full resize-y rounded-2xl border border-sky-200 bg-white/70 p-3.5 text-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:border-sky-900 dark:bg-neutral-900 dark:focus:ring-sky-950"
       />
-      <div className="flex justify-end">
+      <div className="flex items-center gap-2">
+        <input
+          name="tags"
+          placeholder="tags, comma separated (optional)"
+          className="input-soft flex-1"
+        />
         <SubmitButton />
       </div>
     </form>

@@ -10,7 +10,17 @@ export async function createJournalEntry(formData: FormData): Promise<void> {
   const content = String(formData.get("content") ?? "").trim();
   if (!content) return;
 
-  await prisma.journalEntry.create({ data: { userId, content: encrypt(content) } });
+  // Parse comma-separated tags into a clean, de-duped, lowercased list.
+  const tags = Array.from(
+    new Set(
+      String(formData.get("tags") ?? "")
+        .split(",")
+        .map((t) => t.trim().toLowerCase())
+        .filter(Boolean),
+    ),
+  ).slice(0, 10);
+
+  await prisma.journalEntry.create({ data: { userId, content: encrypt(content), tags } });
   revalidatePath("/journal");
 }
 

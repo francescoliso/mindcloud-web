@@ -52,6 +52,8 @@ model JournalEntry {
   userId    String   @db.Uuid
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   content   String
+  // Plaintext labels (not encrypted) so entries stay filterable in SQL.
+  tags      String[] @default([])
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
