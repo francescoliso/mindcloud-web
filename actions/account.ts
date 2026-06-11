@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
 import { signOut } from "@/auth";
+import { sendAccountDeleted } from "@/lib/email";
 
 // Permanently deletes the signed-in user's account and all their data.
 // Related rows (journal, gratitude, mood, reports) cascade automatically.
@@ -13,7 +14,7 @@ export async function deleteAccount(): Promise<void> {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { createdAt: true, onboardedAt: true },
+    select: { email: true, createdAt: true, onboardedAt: true },
   });
   if (!user) return;
 
@@ -26,6 +27,13 @@ export async function deleteAccount(): Promise<void> {
     }),
     prisma.user.delete({ where: { id: userId } }),
   ]);
+
+  // Confirmation email (best-effort — never blocks the deletion).
+  try {
+    await sendAccountDeleted(user.email);
+  } catch (err) {
+    console.error("[account] deletion email failed:", err);
+  }
 
   await signOut({ redirectTo: "/" });
 }

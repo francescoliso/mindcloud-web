@@ -39,3 +39,16 @@ export async function sendInvite(to: string, link: string): Promise<void> {
      <p style="color:#6b7280;font-size:13px">mindcloud.space · Private by design · Your words stay yours.</p>`,
   );
 }
+
+export async function sendAccountDeleted(to: string): Promise<void> {
+  await send(
+    to,
+    "Your MindCloud account has been deleted",
+    `<p>Your <strong>MindCloud</strong> account and all of its data — journal entries,
+     gratitude, moods, and weekly reflections — have been permanently deleted.</p>
+     <p>There's nothing left to do; this is just a confirmation. If this wasn't you,
+     please reply to this email right away.</p>
+     <p>Thank you for spending time with MindCloud. You're welcome back anytime.</p>
+     <p style="color:#6b7280;font-size:13px">mindcloud.space · Private by design · Your words stay yours.</p>`,
+  );
+}
