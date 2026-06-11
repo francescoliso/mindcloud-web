@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  { href: "/admin/waitlist", label: "Waitlist" },
+  { href: "/admin", label: "Dashboard" },
   { href: "/admin/users", label: "Users" },
+  { href: "/admin/waitlist", label: "Waitlist" },
 ];
 
 export function AdminTabs() {
@@ -13,7 +14,8 @@ export function AdminTabs() {
   return (
     <nav className="mb-6 flex gap-1 rounded-full bg-sky-50 p-1 dark:bg-sky-950/40">
       {tabs.map((t) => {
-        const active = pathname === t.href || pathname.startsWith(t.href + "/");
+        // Exact match for the dashboard root; prefix match for sub-pages.
+        const active = t.href === "/admin" ? pathname === "/admin" : pathname.startsWith(t.href);
         return (
           <Link
             key={t.href}

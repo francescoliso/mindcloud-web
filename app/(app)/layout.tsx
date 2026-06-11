@@ -28,11 +28,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <Logo className="h-7 w-auto" />
             <span className="text-sm font-semibold tracking-tight">MindCloud</span>
           </Link>
-          <form action={doSignOut}>
-            <button className="text-sm font-medium text-neutral-500 transition hover:text-sky-600">
-              Sign out
-            </button>
-          </form>
+          <div className="flex items-center gap-4">
+            <Link href="/settings" className="text-sm font-medium text-neutral-500 transition hover:text-sky-600">
+              Settings
+            </Link>
+            <form action={doSignOut}>
+              <button className="text-sm font-medium text-neutral-500 transition hover:text-sky-600">
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
       </nav>
 
