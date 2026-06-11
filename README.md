@@ -125,6 +125,9 @@ Open http://localhost:3000. Set `ADMIN_EMAIL` to your email, then register that 
 | `ADMIN_EMAIL` | Owner's email — can register without an invite and access `/admin` |
 | `APP_URL` | Base URL for invite links (`http://localhost:3000` in dev, `https://mindcloud.space` in prod) |
 | `RESEND_API_KEY` | Resend API key — emails log to console if unset (invite links still work via admin UI) |
+| `ENCRYPTION_KEY` | Base64 of 32 bytes (`openssl rand -base64 32`) — encrypts entries at rest. Unset ⇒ content stored as plaintext (dev) |
+| `CRON_SECRET` | Bearer token guarding the weekly-report cron (`/api/cron/weekly-reports`) |
+| `DATABASE_URL_UNPOOLED` | Neon direct URL — used as Prisma `directUrl` for migrations (locally mirror `DATABASE_URL`) |
 | `SUPABASE_*`, `MIGRATE_*` | Only for the one-off Supabase import script |
 
 ### npm scripts
@@ -165,5 +168,12 @@ The landing and login pages are `force-dynamic` (no ISR window), and every scree
 - **Dates** are stored as *UTC-midnight of the local calendar day*, so daily locks and history don't drift across timezones.
 - **Email** — sent via **Resend** from `hello@mindcloud.space` with DKIM/SPF. Requires a `RESEND_API_KEY` and the domain verified in the Resend dashboard. Console fallback if the key is missing.
 - **Security** — queries are scoped to the session user; Claude/email creds stay server-side; secrets live only in env vars.
+- **Encryption at rest** — journal, gratitude, and report content is AES-256-GCM encrypted (`lib/crypto.ts`, `ENCRYPTION_KEY`) with a `enc:v1:` prefix and plaintext fallback for legacy rows. Tags stay plaintext so they're SQL-filterable.
+- **Rate limiting** — `lib/rate-limit.ts` is a Postgres-backed fixed-window limiter (fail-open) on waitlist join, login, and signup.
+- **Search & tags** — journal entries carry plaintext tags; search decrypts and filters in memory (content is ciphertext), tag filter runs in SQL.
+- **Account deletion + churn** — users delete from `/settings` (cascades all data); a PII-free `AccountDeletion` row feeds the `/admin` dashboard. Confirmation email via Resend.
+- **Background jobs** — Vercel Cron (`vercel.json`) runs `/api/cron/weekly-reports` Mondays to pre-generate reports for active users.
+- **Dark mode** — class-based (`.dark`) with a no-flash inline script and a toggle in Settings; defaults to system preference.
+- **Tests** — Vitest unit tests (`test/`) for week math, mood, and crypto run in CI alongside typecheck/lint/build.
 - **Branding** — the `Logo` component (`components/logo.tsx`) is an inline SVG "Moodmind" mark (two brain hemispheres in a blue→purple→amber mood gradient) used across landing, login, signup, and welcome. Tagline on the landing page: *"Designed with Love in Puglia!"* with *"Private by design · Your words stay yours."* under the waitlist form.
 - **Self-updating PWA** — see "Always-fresh Dock app" above; `force-dynamic` + `AutoRefresh` keep the installed Dock web app current with each deploy.
