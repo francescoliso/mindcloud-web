@@ -1,28 +1,27 @@
 /**
- * Send a test email to verify Gmail SMTP is configured.
+ * Send a test email to verify Resend is configured.
  *   node --env-file=.env --import tsx scripts/send-test-email.ts you@example.com
- * Requires GMAIL_USER and GMAIL_APP_PASSWORD in .env.
+ * Requires RESEND_API_KEY in .env.
  */
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 async function main() {
   const to = process.argv[2];
   if (!to) throw new Error("Usage: send-test-email.ts <recipient@example.com>");
 
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD?.replace(/\s/g, "");
-  if (!user || !pass) throw new Error("Set GMAIL_USER and GMAIL_APP_PASSWORD in .env");
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error("Set RESEND_API_KEY in .env");
 
-  const from = process.env.EMAIL_FROM || `MindCloud <${user}>`;
-  const transport = nodemailer.createTransport({ service: "gmail", auth: { user, pass } });
-
-  const info = await transport.sendMail({
-    from,
+  const resend = new Resend(key);
+  const { data, error } = await resend.emails.send({
+    from: "MindCloud <hello@mindcloud.space>",
     to,
-    subject: "MindCloud test email 🌤️",
-    html: "<p>If you can read this, Gmail SMTP is wired up correctly.</p>",
+    subject: "MindCloud test email",
+    html: "<p>If you can read this, Resend is wired up correctly.</p>",
   });
-  console.log(`✓ sent from "${from}" to ${to} (id: ${info.messageId})`);
+
+  if (error) throw new Error(JSON.stringify(error));
+  console.log(`✓ sent to ${to} (id: ${data?.id})`);
 }
 
 main().catch((e) => {

@@ -38,9 +38,10 @@ Browser ──► Next.js app on Vercel ──► PostgreSQL (Neon)
 | ORM | **Prisma 6** | Type-safe DB access + migrations |
 | Auth | **Auth.js v5** (NextAuth) | Email + password, `bcryptjs`, JWT sessions, **invite-only** |
 | AI | **Anthropic SDK** (`claude-haiku-4-5`) | Server-side only |
-| Email | **nodemailer** via **Gmail SMTP** | No domain needed; logs to console if unconfigured |
-| Hosting | **Vercel** | Deployed via the Vercel CLI (`vercel --prod`); see [DEPLOY.md](./DEPLOY.md) |
-| Install app | **Safari web app** ("Add to Dock") | Standalone PWA wrapper around the live site; self-updates (see below) |
+| Email | **Resend** (`resend` SDK) | From `hello@mindcloud.space` via DKIM; logs to console if `RESEND_API_KEY` unset |
+| Hosting | **Vercel** | Auto-deploys from GitHub (`main` → production); see [DEPLOY.md](./DEPLOY.md) |
+| CI | **GitHub Actions** | Typecheck + lint + build on every push/PR; deploy on push to `main` |
+| Install app | **Safari web app** ("Add to Dock") | Standalone PWA wrapper; self-updates via `/api/version` polling |
 
 ---
 
@@ -122,8 +123,8 @@ Open http://localhost:3000. Set `ADMIN_EMAIL` to your email, then register that 
 | `AUTH_SECRET` | Session signing secret — `openssl rand -base64 33` |
 | `ANTHROPIC_API_KEY` | Claude API key (`sk-ant-…`) — weekly reports only |
 | `ADMIN_EMAIL` | Owner's email — can register without an invite and access `/admin` |
-| `APP_URL` | Base URL for invite links (`http://localhost:3000` in dev) |
-| `GMAIL_USER`, `GMAIL_APP_PASSWORD` | Gmail address + 16-char App Password (emails log to console if unset) |
+| `APP_URL` | Base URL for invite links (`http://localhost:3000` in dev, `https://mindcloud.space` in prod) |
+| `RESEND_API_KEY` | Resend API key — emails log to console if unset (invite links still work via admin UI) |
 | `SUPABASE_*`, `MIGRATE_*` | Only for the one-off Supabase import script |
 
 ### npm scripts
@@ -140,13 +141,13 @@ Open http://localhost:3000. Set `ADMIN_EMAIL` to your email, then register that 
 
 ## Deployment
 
-Deployed to Vercel from this machine with the CLI:
+Every push to `main` deploys automatically via **GitHub Actions** (`.github/workflows/deploy.yml`).
 
-```bash
-vercel --prod        # builds remotely (prisma generate && next build) and aliases mindcloud-web.vercel.app
+```
+git push origin main   # → CI runs, then deploy runs → live on mindcloud.space
 ```
 
-> **Note:** GitHub → Vercel auto-deploy is **not** currently connected, so `git push` alone does **not** deploy — run `vercel --prod`. To switch to push-to-deploy, connect the repo in Vercel → Project → Settings → Git. Full guide in **[DEPLOY.md](./DEPLOY.md)**.
+The workflow needs three GitHub secrets (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`). `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` are already set. `VERCEL_TOKEN` must be created once in the Vercel dashboard (Account → Settings → Tokens → Create → type "Classic") and added as a GitHub secret. Full guide in **[DEPLOY.md](./DEPLOY.md)**.
 
 Production needs these env vars in Vercel: `DATABASE_URL` (from Neon), `AUTH_SECRET`, `ANTHROPIC_API_KEY`, `ADMIN_EMAIL`, `APP_URL`, and (for email) `GMAIL_USER` + `GMAIL_APP_PASSWORD`. Apply schema changes with `prisma migrate deploy` against the Neon **unpooled** URL.
 

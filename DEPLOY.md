@@ -2,30 +2,28 @@
 
 Repo: https://github.com/francescoliso/mindcloud-web (private)
 
-> **Current state (June 2026):** the project is **not** wired to GitHub auto-deploy.
-> Deploys are run manually from the project root with **`vercel --prod`** (the CLI is
-> already linked to the `mindcloud-web` project). `git push` alone does **not** deploy.
-> To switch to push-to-deploy, follow "GitHub auto-deploy" below; otherwise use the
-> **Vercel CLI** section (step 6).
+> **Current state (June 2026):** every push to `main` auto-deploys via
+> **GitHub Actions** (`.github/workflows/deploy.yml`) to **mindcloud.space**.
+> One-time setup: add `VERCEL_TOKEN` as a GitHub secret (see step 1 below).
+> `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` are already set.
 
-## Optional: GitHub auto-deploy (not currently connected)
-1. Go to **vercel.com → Add New… → Project → Import Git Repository**.
-2. Select **`francescoliso/mindcloud-web`** (authorize Vercel's GitHub app if asked).
-3. Framework is auto-detected as **Next.js** — leave build settings default
-   (Vercel runs the `vercel-build` script: `prisma generate && next build`).
-4. **Before clicking Deploy**, set the env vars (step 3 below) and create the
-   database (step 2). After that, every push to `main` deploys automatically.
+## 1. One-time: add VERCEL_TOKEN to GitHub
 
-Then do steps 2–4, and step 5 once to create the tables.
+1. Go to **vercel.com → Account Settings → Tokens → Create**.
+2. Name: `github-actions`, Type: **Classic Token**, Expiration: as preferred.
+3. Copy the token.
+4. Go to **github.com/francescoliso/mindcloud-web → Settings → Secrets → Actions → New secret**.
+5. Name: `VERCEL_TOKEN`, Value: paste the token.
+
+After this, `git push origin main` triggers CI then deploys automatically.
 
 ---
 
-## Alternative: Vercel CLI
-Prerequisites: `vercel login`, then from `~/Desktop/mindcloud-web`:
+## Alternative: Vercel CLI (manual deploy)
+From `~/Desktop/mindcloud-web`:
 ```bash
-vercel link
+vercel --prod
 ```
-Accept the prompts (create a new project named `mindcloud-web`).
 
 ## 2. Create the production database (Vercel Postgres)
 In the Vercel dashboard → your project → **Storage** → **Create Database** → **Postgres**.
