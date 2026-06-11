@@ -47,6 +47,13 @@ model AccountDeletion {
   deletedAt        DateTime @default(now())
 }
 
+// Fixed-window rate limiting (Postgres-backed, no external store).
+model RateLimit {
+  key       String   @id
+  count     Int      @default(0)
+  windowEnd DateTime
+}
+
 model JournalEntry {
   id        String   @id @default(uuid()) @db.Uuid
   userId    String   @db.Uuid

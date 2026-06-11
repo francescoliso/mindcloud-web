@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/admin";
 import { sendWaitlistConfirmation, sendInvite } from "@/lib/email";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 function appUrl() {
   return process.env.APP_URL ?? "http://localhost:3000";
@@ -18,6 +19,10 @@ export async function joinWaitlist(
   _prev: WaitlistState,
   formData: FormData,
 ): Promise<WaitlistState> {
+  if (!(await rateLimit(`waitlist:${await clientIp()}`, 5, 3600))) {
+    return { error: "Too many attempts. Please try again later." };
+  }
+
   const parsed = z.object({ email: z.string().email() }).safeParse({
     email: formData.get("email"),
   });

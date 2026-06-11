@@ -6,10 +6,14 @@ import { AuthError } from "next-auth";
 import { prisma } from "@/lib/db";
 import { signIn } from "@/auth";
 import { isAdmin } from "@/lib/admin";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export type AuthState = { error?: string };
 
 export async function login(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  if (!(await rateLimit(`login:${await clientIp()}`, 10, 600))) {
+    return { error: "Too many attempts. Please wait a few minutes and try again." };
+  }
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   try {
@@ -23,6 +27,9 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
 }
 
 export async function signup(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  if (!(await rateLimit(`signup:${await clientIp()}`, 10, 600))) {
+    return { error: "Too many attempts. Please wait a few minutes and try again." };
+  }
   const password = String(formData.get("password") ?? "");
   const token = String(formData.get("token") ?? "").trim();
   let email = String(formData.get("email") ?? "").trim().toLowerCase();
