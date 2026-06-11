@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { signup, type AuthState } from "@/actions/auth";
+import { Logo } from "@/components/logo";
 
 export function SignupForm({
   token,
@@ -18,9 +19,7 @@ export function SignupForm({
   return (
     <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6">
       <div className="card-soft text-center">
-        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-sky-100 text-3xl dark:bg-sky-950">
-          🌤️
-        </div>
+        <Logo className="mx-auto mb-3 h-14 w-auto" />
         <h1 className="text-2xl font-semibold tracking-tight">MindCloud</h1>
         <p className="mt-1 text-sm text-neutral-500">
           {invited ? "You're invited — create your account." : "Create your account"}

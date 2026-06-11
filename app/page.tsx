@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { WaitlistForm } from "@/components/waitlist-form";
+import { Logo } from "@/components/logo";
 
 const features = [
   { emoji: "📓", title: "Journal", body: "Write freely. Your entries are private and always yours." },
@@ -11,7 +12,7 @@ export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-16">
       <header className="text-center">
-        <div className="mb-4 text-4xl">🌤️</div>
+        <Logo className="mx-auto mb-4 h-16 w-auto" />
         <h1 className="text-4xl font-semibold tracking-tight">MindCloud</h1>
         <p className="mx-auto mt-3 max-w-md text-base text-neutral-500">
           A private, calm space for journaling, gratitude, and weekly reflections on how you&apos;re really doing.

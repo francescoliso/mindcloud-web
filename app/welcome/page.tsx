@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
 import { localDateOnlyUTC } from "@/lib/week";
 import { finishOnboarding } from "@/actions/onboarding";
+import { Logo } from "@/components/logo";
 
 export default async function WelcomePage() {
   const userId = await requireUserId();
@@ -29,7 +30,7 @@ export default async function WelcomePage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-12">
       <div className="mb-8 text-center">
-        <div className="text-4xl">🌤️</div>
+        <Logo className="mx-auto h-14 w-auto" />
         <h1 className="mt-3 text-2xl font-semibold tracking-tight">Welcome to MindCloud</h1>
         <p className="mx-auto mt-2 max-w-sm text-sm text-neutral-500">
           A calm, private place to check in with yourself. Here&apos;s the gentle daily rhythm — try one now, or dive in anytime.
