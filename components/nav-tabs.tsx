@@ -12,17 +12,17 @@ const tabs = [
 export function NavTabs() {
   const pathname = usePathname();
   return (
-    <nav className="flex gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-neutral-900">
+    <nav className="flex gap-1 rounded-full bg-sky-50 p-1 dark:bg-sky-950/40">
       {tabs.map((t) => {
         const active = pathname === t.href || pathname.startsWith(t.href + "/");
         return (
           <Link
             key={t.href}
             href={t.href}
-            className={`flex-1 rounded-lg px-3 py-1.5 text-center text-sm font-medium transition ${
+            className={`flex-1 rounded-full px-3 py-1.5 text-center text-sm font-medium transition ${
               active
-                ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-white"
-                : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+                ? "bg-white text-sky-700 shadow-sm dark:bg-neutral-800 dark:text-sky-300"
+                : "text-neutral-500 hover:text-sky-700 dark:hover:text-sky-200"
             }`}
           >
             {t.label}

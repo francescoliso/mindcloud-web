@@ -14,7 +14,7 @@ export function MoodCheckin({ initial }: { initial: number | null }) {
   }
 
   return (
-    <section className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
+    <section className="card-soft">
       <p className="mb-3 text-sm font-medium">How are you feeling today?</p>
       <div className="flex justify-between gap-1.5">
         {MOODS.map((m) => {

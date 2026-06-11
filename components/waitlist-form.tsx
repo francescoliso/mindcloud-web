@@ -22,12 +22,12 @@ export function WaitlistForm() {
         required
         placeholder="you@example.com"
         aria-label="Email address"
-        className="flex-1 rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-sky-500 dark:border-neutral-700 dark:bg-neutral-900"
+        className="input-soft flex-1"
       />
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-sky-700 disabled:opacity-60"
+        className="btn-soft"
       >
         {pending ? "Joining…" : "Join the waitlist"}
       </button>

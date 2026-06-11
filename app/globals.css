@@ -20,7 +20,59 @@
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(180deg, #eaf4ff 0%, #f5fbff 28%, #ffffff 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* MindCloud "calm & soft" design system */
+.input-soft {
+  width: 100%;
+  border-radius: 9999px;
+  border: 1px solid #bae0fb;
+  background: #ffffff;
+  padding: 10px 16px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-soft::placeholder { color: #94a3b8; }
+.input-soft:focus { border-color: #38bdf8; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.18); }
+
+.btn-soft, .btn-soft-pink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: none;
+  padding: 11px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+.btn-soft { background: #0284c7; }
+.btn-soft:hover { background: #0369a1; }
+.btn-soft-pink { background: #f43f5e; }
+.btn-soft-pink:hover { background: #e11d48; }
+.btn-soft:active, .btn-soft-pink:active { transform: scale(0.98); }
+.btn-soft:disabled, .btn-soft-pink:disabled { opacity: 0.6; cursor: default; }
+
+.card-soft {
+  border-radius: 24px;
+  border: 1px solid #e0f0fb;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.06), 0 8px 28px rgba(2, 132, 199, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  body { background: linear-gradient(180deg, #0b1016 0%, #0a0a0a 55%); }
+  .input-soft { background: #0f1720; border-color: #1e3a52; color: #e5e7eb; }
+  .input-soft::placeholder { color: #64748b; }
+  .input-soft:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.18); }
+  .card-soft { background: rgba(17, 24, 32, 0.72); border-color: #1e293b; box-shadow: none; }
 }

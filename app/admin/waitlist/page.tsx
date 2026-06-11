@@ -21,13 +21,13 @@ export default async function AdminWaitlistPage() {
       </div>
 
       {entries.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">
+        <p className="rounded-2xl border border-dashed border-sky-200 p-6 text-center text-sm text-neutral-500 dark:border-sky-900">
           No signups yet.
         </p>
       ) : (
         <ul className="space-y-3">
           {entries.map((e) => (
-            <li key={e.id} className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
+            <li key={e.id} className="card-soft">
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{e.email}</p>
@@ -40,7 +40,7 @@ export default async function AdminWaitlistPage() {
                   {e.status === "PENDING" && (
                     <form action={approveAndInvite}>
                       <input type="hidden" name="id" value={e.id} />
-                      <button className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-sky-700">
+                      <button className="rounded-full bg-sky-600 px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-sky-700">
                         Approve &amp; invite
                       </button>
                     </form>

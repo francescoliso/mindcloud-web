@@ -38,7 +38,7 @@ export default async function GratitudePage() {
       </section>
 
       {completedToday ? (
-        <section className="rounded-xl border border-pink-200 bg-pink-50/50 p-5 dark:border-pink-900/40 dark:bg-pink-950/20">
+        <section className="rounded-3xl border border-pink-200 bg-pink-50/60 p-6 dark:border-pink-900/40 dark:bg-pink-950/20">
           <p className="mb-3 text-sm font-medium text-pink-700 dark:text-pink-300">
             ✓ Today&apos;s gratitude is complete
           </p>
@@ -60,7 +60,7 @@ export default async function GratitudePage() {
         <section className="space-y-4">
           <h2 className="text-sm font-semibold text-neutral-500">History</h2>
           {[...history.entries()].map(([key, items]) => (
-            <div key={key} className="rounded-xl border border-neutral-200 p-4 dark:border-neutral-800">
+            <div key={key} className="card-soft">
               <p className="mb-2 text-xs font-medium text-neutral-500">
                 {formatDateOnly(items[0].entryDate)}
               </p>

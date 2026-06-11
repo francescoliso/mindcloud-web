@@ -10,7 +10,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-700 disabled:opacity-60"
+      className="btn-soft"
     >
       {pending ? "Saving…" : "Save entry"}
     </button>
@@ -34,7 +34,7 @@ export function JournalComposer() {
         rows={4}
         required
         placeholder="What's on your mind today?"
-        className="w-full resize-y rounded-xl border border-neutral-300 bg-transparent p-3 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700"
+        className="w-full resize-y rounded-2xl border border-sky-200 bg-white/70 p-3.5 text-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:border-sky-900 dark:bg-neutral-900 dark:focus:ring-sky-950"
       />
       <div className="flex justify-end">
         <SubmitButton />

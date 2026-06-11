@@ -23,14 +23,14 @@ export default async function ReportsPage() {
       </section>
 
       {reports.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-neutral-300 p-6 text-center text-sm text-neutral-500 dark:border-neutral-700">
+        <p className="rounded-2xl border border-dashed border-sky-200 p-6 text-center text-sm text-neutral-500 dark:border-sky-900">
           No reports yet. Generate one to reflect on your week.
         </p>
       ) : (
         reports.map((report) => (
           <article
             key={report.id}
-            className="rounded-xl border border-neutral-200 p-5 dark:border-neutral-800"
+            className="card-soft"
           >
             <p className="mb-2 text-xs font-medium text-neutral-500">
               Week of {formatDateOnly(report.weekStart)}

@@ -24,7 +24,7 @@ export function GratitudeForm() {
             name={`item${pos}`}
             required
             placeholder={prompts[i]}
-            className="w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700"
+            className="input-soft"
           />
         </div>
       ))}
@@ -38,7 +38,7 @@ export function GratitudeForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-pink-700 disabled:opacity-60"
+        className="btn-soft-pink w-full"
       >
         {pending ? "Saving…" : "Complete today's gratitude"}
       </button>

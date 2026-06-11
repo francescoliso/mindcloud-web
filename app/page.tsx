@@ -35,7 +35,7 @@ export default function Home() {
         {features.map((f) => (
           <div
             key={f.title}
-            className="rounded-xl border border-neutral-200 p-4 text-center dark:border-neutral-800"
+            className="card-soft text-center"
           >
             <div className="text-2xl">{f.emoji}</div>
             <h2 className="mt-2 text-sm font-semibold">{f.title}</h2>

@@ -41,7 +41,7 @@ export default async function WelcomePage() {
           <li key={s.label}>
             <Link
               href={s.href}
-              className="flex items-start gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-neutral-400 dark:border-neutral-800 dark:hover:border-neutral-600"
+              className="card-soft flex items-start gap-3 transition hover:border-sky-300"
             >
               <span
                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs ${
@@ -62,9 +62,7 @@ export default async function WelcomePage() {
       </ul>
 
       <form action={finishOnboarding} className="mt-8">
-        <button className="w-full rounded-lg bg-sky-600 px-3 py-2.5 text-sm font-medium text-white transition hover:bg-sky-700">
-          Start journaling
-        </button>
+        <button className="btn-soft w-full">Start journaling</button>
       </form>
     </main>
   );
