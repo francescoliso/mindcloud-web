@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 import { Logo } from "@/components/logo";
+import { AdminTabs } from "@/components/admin-tabs";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAdmin();
@@ -18,7 +19,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </div>
       </nav>
 
-      <div className="mx-auto w-full max-w-2xl px-4 py-6">{children}</div>
+      <div className="mx-auto w-full max-w-2xl px-4 py-6">
+        <AdminTabs />
+        {children}
+      </div>
     </div>
   );
 }
