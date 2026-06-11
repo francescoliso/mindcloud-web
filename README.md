@@ -17,7 +17,7 @@ It started as a native macOS (SwiftUI) app and was rewritten as a web app on Ver
 Browser ──► Next.js app on Vercel ──► PostgreSQL (Neon)
                   │
                   ├──► Anthropic API (Claude Haiku)  ← weekly reports only
-                  └──► Gmail SMTP (nodemailer)        ← waitlist / invite emails
+                  └──► Resend API                     ← waitlist / invite emails
 ```
 
 - The **Next.js app** serves the UI *and* the server logic — there is no separate backend.
@@ -52,7 +52,7 @@ Browser ──► Next.js app on Vercel ──► PostgreSQL (Neon)
 3. The invitee opens the link, sets a password, and an account is created. Signup is refused without a valid token — **except** `ADMIN_EMAIL`, which can register to bootstrap the first admin.
 4. New users pass through **`/welcome`** (guided onboarding) once, tracked by `User.onboardedAt`.
 
-Email is optional: if Gmail isn't configured, the admin page's **copyable invite link** still works (share it manually).
+Email is optional: if `RESEND_API_KEY` isn't set, emails log to the server console and the admin page's **copyable invite link** still works (share it manually).
 
 ---
 
@@ -78,7 +78,7 @@ lib/
   db.ts                         Prisma client (singleton)
   session.ts / admin.ts         requireUserId() / requireAdmin()
   claude.ts                     Weekly-report prompt + Anthropic call
-  email.ts                      Gmail SMTP wrapper (console fallback)
+  email.ts                      Resend wrapper — from hello@mindcloud.space (console fallback if key unset)
   mood.ts, week.ts, format.ts   Helpers
 auth.ts / auth.config.ts        Auth.js instance / edge-safe config
 proxy.ts                        Route protection (Next 16's renamed "middleware")
@@ -134,7 +134,7 @@ Open http://localhost:3000. Set `ADMIN_EMAIL` to your email, then register that 
 | `npm run dev` / `build` | Dev server / production build |
 | `npm run db:migrate` | Create/apply a migration locally |
 | `npm run db:studio` | Visual DB browser (Prisma Studio) |
-| `npm run email:test <addr>` | Send a test email via Gmail SMTP |
+| `npm run email:test <addr>` | Send a test email via Resend (requires `RESEND_API_KEY` in `.env`) |
 | `npm run migrate:supabase` | Import data from the old Supabase DB |
 
 ---
@@ -149,7 +149,7 @@ git push origin main   # → CI runs, then deploy runs → live on mindcloud.spa
 
 The workflow needs three GitHub secrets (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`). `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` are already set. `VERCEL_TOKEN` must be created once in the Vercel dashboard (Account → Settings → Tokens → Create → type "Classic") and added as a GitHub secret. Full guide in **[DEPLOY.md](./DEPLOY.md)**.
 
-Production needs these env vars in Vercel: `DATABASE_URL` (from Neon), `AUTH_SECRET`, `ANTHROPIC_API_KEY`, `ADMIN_EMAIL`, `APP_URL`, and (for email) `GMAIL_USER` + `GMAIL_APP_PASSWORD`. Apply schema changes with `prisma migrate deploy` against the Neon **unpooled** URL.
+Production needs these env vars in Vercel: `DATABASE_URL` (from Neon), `AUTH_SECRET`, `ANTHROPIC_API_KEY`, `ADMIN_EMAIL`, `APP_URL` (`https://mindcloud.space`), and `RESEND_API_KEY`. Apply schema changes with `prisma migrate deploy` against the Neon **unpooled** URL.
 
 ### Always-fresh Dock app
 
@@ -163,7 +163,7 @@ The landing and login pages are `force-dynamic` (no ISR window), and every scree
 - **Prisma pinned to v6** — v7 dropped the `url` field for a driver-adapter setup; v6 keeps the simpler approach.
 - **No component library** — plain Tailwind, to avoid tooling friction on Next 16 / Tailwind v4.
 - **Dates** are stored as *UTC-midnight of the local calendar day*, so daily locks and history don't drift across timezones.
-- **Email needs no domain** — Gmail SMTP via an App Password (requires 2-Step Verification on the Google account).
+- **Email** — sent via **Resend** from `hello@mindcloud.space` with DKIM/SPF. Requires a `RESEND_API_KEY` and the domain verified in the Resend dashboard. Console fallback if the key is missing.
 - **Security** — queries are scoped to the session user; Claude/email creds stay server-side; secrets live only in env vars.
 - **Branding** — the `Logo` component (`components/logo.tsx`) is an inline SVG "Moodmind" mark (two brain hemispheres in a blue→purple→amber mood gradient) used across landing, login, signup, and welcome. Tagline on the landing page: *"Designed with Love in Puglia!"* with *"Private by design · Your words stay yours."* under the waitlist form.
 - **Self-updating PWA** — see "Always-fresh Dock app" above; `force-dynamic` + `AutoRefresh` keep the installed Dock web app current with each deploy.
