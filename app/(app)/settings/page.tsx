@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
 import { auth } from "@/auth";
 import { DeleteAccount } from "@/components/delete-account";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { formatDateOnly } from "@/lib/format";
 
 export default async function SettingsPage() {
@@ -29,6 +30,11 @@ export default async function SettingsPage() {
             <span className="font-medium">{formatDateOnly(user.createdAt)}</span>
           </div>
         )}
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-neutral-500">Appearance</h2>
+        <ThemeToggle />
       </section>
 
       <section className="space-y-3">

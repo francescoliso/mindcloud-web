@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: `dark:` applies under a `.dark` ancestor, so a
+   manual toggle can override the system preference. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,11 +16,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {
@@ -69,10 +71,8 @@ body {
   box-shadow: 0 1px 3px rgba(2, 132, 199, 0.06), 0 8px 28px rgba(2, 132, 199, 0.05);
 }
 
-@media (prefers-color-scheme: dark) {
-  body { background: linear-gradient(180deg, #0b1016 0%, #0a0a0a 55%); }
-  .input-soft { background: #0f1720; border-color: #1e3a52; color: #e5e7eb; }
-  .input-soft::placeholder { color: #64748b; }
-  .input-soft:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.18); }
-  .card-soft { background: rgba(17, 24, 32, 0.72); border-color: #1e293b; box-shadow: none; }
-}
+.dark body { background: linear-gradient(180deg, #0b1016 0%, #0a0a0a 55%); }
+.dark .input-soft { background: #0f1720; border-color: #1e3a52; color: #e5e7eb; }
+.dark .input-soft::placeholder { color: #64748b; }
+.dark .input-soft:focus { border-color: #0ea5e9; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.18); }
+.dark .card-soft { background: rgba(17, 24, 32, 0.72); border-color: #1e293b; box-shadow: none; }
