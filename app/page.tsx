@@ -5,15 +5,9 @@ import { Logo } from "@/components/logo";
 // Always render fresh so a redeploy is reflected immediately (no ISR window).
 export const dynamic = "force-dynamic";
 
-const features = [
-  { emoji: "📓", title: "Journal", body: "Write freely. Your entries are private and always yours." },
-  { emoji: "🙏", title: "Gratitude", body: "Note three good things a day — a gentle daily habit." },
-  { emoji: "📊", title: "Weekly reflections", body: "A warm, AI-written summary of your week's mood and themes." },
-];
-
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-16">
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-16">
       <header className="text-center">
         <Logo className="mx-auto mb-4 h-16 w-auto" />
         <h1 className="text-4xl font-semibold tracking-tight">MindCloud</h1>
@@ -36,19 +30,6 @@ export default function Home() {
             Sign in
           </Link>
         </p>
-      </section>
-
-      <section className="mt-14 grid gap-4 sm:grid-cols-3">
-        {features.map((f) => (
-          <div
-            key={f.title}
-            className="card-soft text-center"
-          >
-            <div className="text-2xl">{f.emoji}</div>
-            <h2 className="mt-2 text-sm font-semibold">{f.title}</h2>
-            <p className="mt-1 text-xs text-neutral-500">{f.body}</p>
-          </div>
-        ))}
       </section>
 
       <footer className="mt-16 text-center text-xs text-neutral-400">
