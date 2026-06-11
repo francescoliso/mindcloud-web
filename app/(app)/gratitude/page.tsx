@@ -33,7 +33,7 @@ export default async function GratitudePage() {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="text-xl font-semibold tracking-tight">Gratitude</h1>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Gratitude</h1>
         <p className="text-sm text-neutral-500">Three things you&apos;re thankful for today.</p>
       </section>
 

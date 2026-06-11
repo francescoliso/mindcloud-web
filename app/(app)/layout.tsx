@@ -4,6 +4,7 @@ import { requireUserId } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { signOut } from "@/auth";
 import { NavTabs } from "@/components/nav-tabs";
+import { Logo } from "@/components/logo";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const userId = await requireUserId();
@@ -19,19 +20,26 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-6">
-      <header className="mb-5 flex items-center justify-between">
-        <Link href="/journal" className="text-lg font-semibold tracking-tight">
-          MindCloud
-        </Link>
-        <form action={doSignOut}>
-          <button className="text-sm text-neutral-500 transition hover:text-neutral-800 dark:hover:text-neutral-200">
-            Sign out
-          </button>
-        </form>
-      </header>
-      <NavTabs />
-      <main className="mt-6">{children}</main>
+    <div className="min-h-screen">
+      {/* Sticky frosted nav — matches the landing page */}
+      <nav className="sticky top-0 z-20 border-b border-sky-100/70 bg-white/70 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/60">
+        <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
+          <Link href="/journal" className="flex items-center gap-2">
+            <Logo className="h-7 w-auto" />
+            <span className="text-sm font-semibold tracking-tight">MindCloud</span>
+          </Link>
+          <form action={doSignOut}>
+            <button className="text-sm font-medium text-neutral-500 transition hover:text-sky-600">
+              Sign out
+            </button>
+          </form>
+        </div>
+      </nav>
+
+      <div className="mx-auto w-full max-w-2xl px-4 py-6">
+        <NavTabs />
+        <main className="mt-8">{children}</main>
+      </div>
     </div>
   );
 }

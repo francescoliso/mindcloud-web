@@ -22,7 +22,7 @@ export default async function JournalPage() {
   return (
     <div className="space-y-6">
       <section>
-        <h1 className="text-xl font-semibold tracking-tight">Today&apos;s Journal</h1>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Today&apos;s Journal</h1>
         <p className="text-sm text-neutral-500">Write down what&apos;s on your mind.</p>
       </section>
 
