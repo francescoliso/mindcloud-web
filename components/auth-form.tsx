@@ -39,13 +39,12 @@ export function AuthForm({ mode, action }: { mode: "login" | "signup"; action: A
           </button>
         </form>
 
-        <p className="mt-5 text-sm text-neutral-500">
-          {isLogin ? (
-            <>New here?{" "}<Link href="/" className="font-medium text-sky-600 hover:underline">Join the waitlist</Link></>
-          ) : (
-            <>Already have an account?{" "}<Link href="/login" className="font-medium text-sky-600 hover:underline">Sign in</Link></>
-          )}
-        </p>
+        {!isLogin && (
+          <p className="mt-5 text-sm text-neutral-500">
+            Already have an account?{" "}
+            <Link href="/login" className="font-medium text-sky-600 hover:underline">Sign in</Link>
+          </p>
+        )}
       </div>
     </div>
   );
