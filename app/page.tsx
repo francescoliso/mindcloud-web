@@ -35,9 +35,9 @@ const trust = [
 
 export default function Home() {
   return (
-    <div className="w-full">
+    <div className="h-screen snap-y snap-mandatory overflow-y-scroll scroll-smooth">
       {/* Nav */}
-      <nav className="sticky top-0 z-10 border-b border-sky-100/70 bg-white/70 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/60">
+      <nav className="sticky top-0 z-20 border-b border-sky-100/70 bg-white/70 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/60">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-2">
             <Logo className="h-7 w-auto" />
@@ -50,30 +50,29 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <header className="mx-auto max-w-2xl px-6 pb-14 pt-12 text-center sm:pt-16">
+      <section className="flex min-h-screen snap-start flex-col items-center justify-center px-6 text-center">
         <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:border-sky-900 dark:bg-sky-950/50 dark:text-sky-300">
           Invite-only · Join the waitlist
         </span>
-        <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-          Check in with{" "}
-          <span className="text-sky-600">yourself.</span>
+        <h1 className="mt-5 max-w-2xl text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
+          Check in with <span className="text-sky-600">yourself.</span>
         </h1>
         <p className="mx-auto mt-4 max-w-md text-base text-neutral-500">
           A private journal, gratitude log, and weekly AI reflections — built for clarity, not clout.
         </p>
-        <div className="mx-auto mt-7 max-w-md">
+        <div className="mx-auto mt-8 w-full max-w-md">
           <WaitlistForm />
         </div>
         <p className="mt-3 text-xs text-neutral-400">
           Private by design · Your words stay yours.
         </p>
-      </header>
+      </section>
 
       {/* Features */}
-      <section className="border-t border-sky-100/70 dark:border-slate-800">
-        <div className="mx-auto max-w-5xl px-6 py-16">
+      <section className="flex min-h-screen snap-start items-center border-t border-sky-100/70 px-6 dark:border-slate-800">
+        <div className="mx-auto w-full max-w-5xl py-16">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">What&apos;s inside</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
             Three habits. One calm space.
           </h2>
           <p className="mt-2 max-w-md text-sm text-neutral-500">
@@ -97,10 +96,10 @@ export default function Home() {
       </section>
 
       {/* Privacy / trust */}
-      <section className="border-t border-sky-100/70 dark:border-slate-800">
-        <div className="mx-auto max-w-5xl px-6 py-16">
+      <section className="flex min-h-screen snap-start items-center border-t border-sky-100/70 px-6 dark:border-slate-800">
+        <div className="mx-auto w-full max-w-5xl py-16">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">Privacy</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
             Private by design. Your words stay yours.
           </h2>
           <p className="mt-2 max-w-lg text-sm text-neutral-500">
@@ -117,11 +116,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Story */}
-      <section className="border-t border-sky-100/70 dark:border-slate-800">
-        <div className="mx-auto max-w-2xl px-6 py-16 text-center">
+      {/* Story + footer (last screen) */}
+      <section className="flex min-h-screen snap-start flex-col border-t border-sky-100/70 dark:border-slate-800">
+        <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-6 py-16 text-center">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">Our story</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Why we built this.</h2>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Why we built this.</h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-neutral-500">
             MindCloud started as a personal macOS app — a quiet place to write without noise or an
             audience. It grew into a daily habit for journaling, gratitude, and weekly reflection.
@@ -129,24 +128,23 @@ export default function Home() {
             space, and we want it to stay that way.
           </p>
         </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="border-t border-sky-100/70 dark:border-slate-800">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
-          <div className="flex items-center gap-2">
-            <Logo className="h-6 w-auto" />
-            <span className="text-sm font-medium">MindCloud</span>
+        <footer className="border-t border-sky-100/70 dark:border-slate-800">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
+            <div className="flex items-center gap-2">
+              <Logo className="h-6 w-auto" />
+              <span className="text-sm font-medium">MindCloud</span>
+            </div>
+            <p className="inline-flex items-center gap-1.5 text-xs text-neutral-400">
+              Designed with Love in Puglia
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="#f43f5e" aria-label="love">
+                <path d="M12 21s-6.7-4.35-9.33-8.07C.9 10.36 1.4 6.9 4.06 5.6c2-1 4.2-.3 5.4 1.4L12 9.9l2.54-2.9c1.2-1.7 3.4-2.4 5.4-1.4 2.66 1.3 3.16 4.76 1.39 7.33C18.7 16.65 12 21 12 21Z" />
+              </svg>
+            </p>
+            <SocialIcons />
           </div>
-          <p className="inline-flex items-center gap-1.5 text-xs text-neutral-400">
-            Designed with Love in Puglia
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="#f43f5e" aria-label="love">
-              <path d="M12 21s-6.7-4.35-9.33-8.07C.9 10.36 1.4 6.9 4.06 5.6c2-1 4.2-.3 5.4 1.4L12 9.9l2.54-2.9c1.2-1.7 3.4-2.4 5.4-1.4 2.66 1.3 3.16 4.76 1.39 7.33C18.7 16.65 12 21 12 21Z" />
-            </svg>
-          </p>
-          <SocialIcons />
-        </div>
-      </footer>
+        </footer>
+      </section>
     </div>
   );
 }
