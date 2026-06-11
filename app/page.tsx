@@ -24,6 +24,9 @@ export default function Home() {
         </p>
         <WaitlistForm />
         <p className="text-center text-xs text-neutral-400">
+          Private by design · Your words stay yours.
+        </p>
+        <p className="text-center text-xs text-neutral-400">
           Already invited?{" "}
           <Link href="/login" className="text-sky-600 hover:underline">
             Sign in
@@ -45,7 +48,7 @@ export default function Home() {
       </section>
 
       <footer className="mt-16 text-center text-xs text-neutral-400">
-        Private by design · Your words stay yours.
+        Designed with Love in Puglia!
       </footer>
     </main>
   );
