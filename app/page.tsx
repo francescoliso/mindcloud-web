@@ -2,6 +2,7 @@ import Link from "next/link";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { Logo } from "@/components/logo";
 import { SocialIcons } from "@/components/social-icons";
+import { AppPreview } from "@/components/app-preview";
 
 // Always render fresh so a redeploy is reflected immediately (no ISR window).
 export const dynamic = "force-dynamic";
@@ -50,22 +51,32 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <section className="flex min-h-screen snap-start flex-col items-center justify-center px-6 text-center">
-        <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:border-sky-900 dark:bg-sky-950/50 dark:text-sky-300">
-          Invite-only · Join the waitlist
-        </span>
-        <h1 className="mt-5 max-w-2xl text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
-          Check in with <span className="text-sky-600">yourself.</span>
-        </h1>
-        <p className="mx-auto mt-4 max-w-md text-base text-neutral-500">
-          A private journal, gratitude log, and weekly AI reflections — built for clarity, not clout.
-        </p>
-        <div className="mx-auto mt-8 w-full max-w-md">
-          <WaitlistForm />
+      <section className="flex min-h-screen snap-start items-center px-6">
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-12 py-12 lg:grid-cols-2">
+          {/* left: copy + form */}
+          <div className="text-center lg:text-left">
+            <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:border-sky-900 dark:bg-sky-950/50 dark:text-sky-300">
+              Invite-only · Join the waitlist
+            </span>
+            <h1 className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+              Check in with <span className="text-sky-600">yourself.</span>
+            </h1>
+            <p className="mx-auto mt-5 max-w-md text-lg text-neutral-500 lg:mx-0">
+              A private journal, gratitude log, and weekly AI reflections — built for clarity, not clout.
+            </p>
+            <div className="mx-auto mt-8 w-full max-w-md lg:mx-0">
+              <WaitlistForm />
+            </div>
+            <p className="mt-3 text-xs text-neutral-400">
+              Private by design · Your words stay yours.
+            </p>
+          </div>
+
+          {/* right: app preview */}
+          <div className="mx-auto w-full max-w-md lg:max-w-none">
+            <AppPreview />
+          </div>
         </div>
-        <p className="mt-3 text-xs text-neutral-400">
-          Private by design · Your words stay yours.
-        </p>
       </section>
 
       {/* Features */}
