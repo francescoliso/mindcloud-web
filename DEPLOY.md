@@ -30,11 +30,19 @@ Connecting it auto-adds connection env vars to the project, including:
 If Prisma's `DATABASE_URL` isn't set automatically, add it manually pointing at the **pooled** string.
 
 ## 3. Set the remaining env vars
-```bash
-vercel env add ANTHROPIC_API_KEY production   # paste your ROTATED key
-vercel env add AUTH_SECRET production          # paste: openssl rand -base64 33
-```
-(Add them to `preview`/`development` too if you want those environments to work.)
+In Vercel → **Settings → Environment Variables (Production)**:
+
+| Variable | Value |
+|---|---|
+| `ANTHROPIC_API_KEY` | your Claude key (`sk-ant-…`) |
+| `AUTH_SECRET` | `openssl rand -base64 33` |
+| `ADMIN_EMAIL` | your email — bootstraps admin + `/admin/waitlist` access |
+| `APP_URL` | your `https://…vercel.app` URL (for invite links) |
+| `GMAIL_USER` | your Gmail address *(optional — for emails)* |
+| `GMAIL_APP_PASSWORD` | a 16-char Google App Password *(optional)* |
+
+Email is optional: without `GMAIL_*`, invite links still appear (copyable) on the admin page.
+Changing env vars requires a **redeploy** to take effect.
 
 ## 4. Create the tables in the production DB (one time)
 Run the migration against the **direct/unpooled** connection string (pooled connections can stall on migration locks):
@@ -59,10 +67,12 @@ vercel --prod
 Vercel runs `vercel-build` (`prisma generate && next build`). On success it prints your live URL.
 
 ## Smoke test the deployment
-1. Open the URL → you should be redirected to `/login`.
-2. Sign up → land on `/journal`. Add an entry; it appears newest-first.
-3. Gratitude: fill all three → it locks (read-only) for the day.
-4. Reports: **Generate this week** → a report appears (needs `ANTHROPIC_API_KEY`).
+1. Open the URL → the **landing page** with a waitlist form.
+2. **Bootstrap admin:** go to `/signup`, register with the `ADMIN_EMAIL` address → you land on `/welcome` (onboarding) → "Start journaling".
+3. Visit `/admin/waitlist` → join the waitlist with another email at `/`, then **Approve & invite** it → open the copied invite link → set a password → account created.
+4. Journal: add an entry + tap a mood. Gratitude: fill all three → it locks for the day.
+5. Reports: **Generate this week** → a report appears (needs `ANTHROPIC_API_KEY`).
+6. (If email configured) `npm run email:test you@addr` sends a test via Gmail SMTP.
 
 ## Notes
 - `vercel-build` is set so the Prisma client is regenerated on every deploy.
