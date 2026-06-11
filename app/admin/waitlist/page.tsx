@@ -16,7 +16,7 @@ export default async function AdminWaitlistPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">Waitlist</h1>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Waitlist</h1>
         <p className="text-sm text-neutral-500">{entries.length} signups · approve to send an invite.</p>
       </div>
 
