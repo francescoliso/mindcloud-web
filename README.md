@@ -39,7 +39,8 @@ Browser ──► Next.js app on Vercel ──► PostgreSQL (Neon)
 | Auth | **Auth.js v5** (NextAuth) | Email + password, `bcryptjs`, JWT sessions, **invite-only** |
 | AI | **Anthropic SDK** (`claude-haiku-4-5`) | Server-side only |
 | Email | **nodemailer** via **Gmail SMTP** | No domain needed; logs to console if unconfigured |
-| Hosting | **Vercel** | Auto-deploys from GitHub |
+| Hosting | **Vercel** | Deployed via the Vercel CLI (`vercel --prod`); see [DEPLOY.md](./DEPLOY.md) |
+| Install app | **Safari web app** ("Add to Dock") | Standalone PWA wrapper around the live site; self-updates (see below) |
 
 ---
 
@@ -67,8 +68,11 @@ app/
   welcome/                      Guided first-run onboarding
   admin/waitlist/               Admin: approve & invite (gated by ADMIN_EMAIL)
   api/auth/[...nextauth]        Auth.js HTTP handler
+  api/version                   Returns the Vercel deployment id (for self-update)
 actions/                        Server Actions: auth, journal, gratitude, mood, reports, waitlist, onboarding
 components/                     Client components (forms, nav, mood check-in, copy field)
+  logo.tsx                      Moodmind brand mark (brain hemispheres, mood gradient)
+  auto-refresh.tsx              Polls api/version, reloads the app on a new deploy
 lib/
   db.ts                         Prisma client (singleton)
   session.ts / admin.ts         requireUserId() / requireAdmin()
@@ -136,7 +140,19 @@ Open http://localhost:3000. Set `ADMIN_EMAIL` to your email, then register that 
 
 ## Deployment
 
-Connected to Vercel — **every push to `main` auto-deploys**. Full guide in **[DEPLOY.md](./DEPLOY.md)**. Production needs these env vars in Vercel: `DATABASE_URL` (from Neon), `AUTH_SECRET`, `ANTHROPIC_API_KEY`, `ADMIN_EMAIL`, `APP_URL`, and (for email) `GMAIL_USER` + `GMAIL_APP_PASSWORD`. Apply schema changes with `prisma migrate deploy` against the Neon **unpooled** URL.
+Deployed to Vercel from this machine with the CLI:
+
+```bash
+vercel --prod        # builds remotely (prisma generate && next build) and aliases mindcloud-web.vercel.app
+```
+
+> **Note:** GitHub → Vercel auto-deploy is **not** currently connected, so `git push` alone does **not** deploy — run `vercel --prod`. To switch to push-to-deploy, connect the repo in Vercel → Project → Settings → Git. Full guide in **[DEPLOY.md](./DEPLOY.md)**.
+
+Production needs these env vars in Vercel: `DATABASE_URL` (from Neon), `AUTH_SECRET`, `ANTHROPIC_API_KEY`, `ADMIN_EMAIL`, `APP_URL`, and (for email) `GMAIL_USER` + `GMAIL_APP_PASSWORD`. Apply schema changes with `prisma migrate deploy` against the Neon **unpooled** URL.
+
+### Always-fresh Dock app
+
+The landing and login pages are `force-dynamic` (no ISR window), and every screen mounts `AutoRefresh`, which polls `/api/version` (the Vercel deployment id) every 30s — and on window focus — and calls `location.reload()` when a new build ships. So the standalone Safari "Add to Dock" web app picks up deploys automatically, without a manual reload.
 
 ---
 
@@ -148,3 +164,5 @@ Connected to Vercel — **every push to `main` auto-deploys**. Full guide in **[
 - **Dates** are stored as *UTC-midnight of the local calendar day*, so daily locks and history don't drift across timezones.
 - **Email needs no domain** — Gmail SMTP via an App Password (requires 2-Step Verification on the Google account).
 - **Security** — queries are scoped to the session user; Claude/email creds stay server-side; secrets live only in env vars.
+- **Branding** — the `Logo` component (`components/logo.tsx`) is an inline SVG "Moodmind" mark (two brain hemispheres in a blue→purple→amber mood gradient) used across landing, login, signup, and welcome. Tagline on the landing page: *"Designed with Love in Puglia!"* with *"Private by design · Your words stay yours."* under the waitlist form.
+- **Self-updating PWA** — see "Always-fresh Dock app" above; `force-dynamic` + `AutoRefresh` keep the installed Dock web app current with each deploy.

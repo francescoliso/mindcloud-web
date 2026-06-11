@@ -2,7 +2,13 @@
 
 Repo: https://github.com/francescoliso/mindcloud-web (private)
 
-## Recommended: GitHub auto-deploy
+> **Current state (June 2026):** the project is **not** wired to GitHub auto-deploy.
+> Deploys are run manually from the project root with **`vercel --prod`** (the CLI is
+> already linked to the `mindcloud-web` project). `git push` alone does **not** deploy.
+> To switch to push-to-deploy, follow "GitHub auto-deploy" below; otherwise use the
+> **Vercel CLI** section (step 6).
+
+## Optional: GitHub auto-deploy (not currently connected)
 1. Go to **vercel.com → Add New… → Project → Import Git Repository**.
 2. Select **`francescoliso/mindcloud-web`** (authorize Vercel's GitHub app if asked).
 3. Framework is auto-detected as **Next.js** — leave build settings default
