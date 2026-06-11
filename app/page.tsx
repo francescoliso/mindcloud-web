@@ -50,7 +50,7 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <header className="mx-auto max-w-2xl px-6 pb-16 pt-16 text-center sm:pt-24">
+      <header className="mx-auto max-w-2xl px-6 pb-14 pt-12 text-center sm:pt-16">
         <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:border-sky-900 dark:bg-sky-950/50 dark:text-sky-300">
           Invite-only · Join the waitlist
         </span>
@@ -71,7 +71,7 @@ export default function Home() {
 
       {/* Features */}
       <section className="border-t border-sky-100/70 dark:border-slate-800">
-        <div className="mx-auto max-w-5xl px-6 py-20">
+        <div className="mx-auto max-w-5xl px-6 py-16">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">What&apos;s inside</p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
             Three habits. One calm space.
@@ -98,7 +98,7 @@ export default function Home() {
 
       {/* Privacy / trust */}
       <section className="border-t border-sky-100/70 dark:border-slate-800">
-        <div className="mx-auto max-w-5xl px-6 py-20">
+        <div className="mx-auto max-w-5xl px-6 py-16">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">Privacy</p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
             Private by design. Your words stay yours.
@@ -119,7 +119,7 @@ export default function Home() {
 
       {/* Story */}
       <section className="border-t border-sky-100/70 dark:border-slate-800">
-        <div className="mx-auto max-w-2xl px-6 py-20 text-center">
+        <div className="mx-auto max-w-2xl px-6 py-16 text-center">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">Our story</p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Why we built this.</h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-neutral-500">
@@ -127,25 +127,6 @@ export default function Home() {
             audience. It grew into a daily habit for journaling, gratitude, and weekly reflection.
             We kept it invite-only because this isn&apos;t a social network. It&apos;s a private
             space, and we want it to stay that way.
-          </p>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="border-t border-sky-100/70 dark:border-slate-800">
-        <div className="mx-auto max-w-2xl px-6 py-20 text-center">
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Ready to start?</h2>
-          <p className="mt-2 text-sm text-neutral-500">
-            Join the waitlist and we&apos;ll reach out when your spot is ready.
-          </p>
-          <div className="mx-auto mt-7 max-w-md">
-            <WaitlistForm />
-          </div>
-          <p className="mt-3 text-xs text-neutral-400">
-            Already invited?{" "}
-            <Link href="/login" className="text-sky-600 hover:underline">
-              Sign in
-            </Link>
           </p>
         </div>
       </section>
