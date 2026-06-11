@@ -2,6 +2,9 @@ import Link from "next/link";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { Logo } from "@/components/logo";
 
+// Always render fresh so a redeploy is reflected immediately (no ISR window).
+export const dynamic = "force-dynamic";
+
 const features = [
   { emoji: "📓", title: "Journal", body: "Write freely. Your entries are private and always yours." },
   { emoji: "🙏", title: "Gratitude", body: "Note three good things a day — a gentle daily habit." },
