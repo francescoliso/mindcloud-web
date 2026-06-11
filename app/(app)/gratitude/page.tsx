@@ -3,6 +3,7 @@ import { requireUserId } from "@/lib/session";
 import { localDateOnlyUTC } from "@/lib/week";
 import { formatDateOnly } from "@/lib/format";
 import { GratitudeForm } from "@/components/gratitude-form";
+import { decrypt } from "@/lib/crypto";
 
 export default async function GratitudePage() {
   const userId = await requireUserId();
@@ -46,7 +47,7 @@ export default async function GratitudePage() {
             {todayItems.map((item) => (
               <li key={item.id} className="flex gap-2 text-sm">
                 <span className="text-pink-500">{item.position}.</span>
-                <span>{item.content}</span>
+                <span>{decrypt(item.content)}</span>
               </li>
             ))}
           </ul>
@@ -68,7 +69,7 @@ export default async function GratitudePage() {
                 {items.map((item) => (
                   <li key={item.id} className="flex gap-2 text-sm">
                     <span className="text-pink-500">{item.position}.</span>
-                    <span>{item.content}</span>
+                    <span>{decrypt(item.content)}</span>
                   </li>
                 ))}
               </ul>

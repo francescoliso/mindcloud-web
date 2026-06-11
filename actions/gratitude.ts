@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
 import { localDateOnlyUTC } from "@/lib/week";
+import { encrypt } from "@/lib/crypto";
 
 export type GratitudeState = { error?: string };
 
@@ -29,8 +30,8 @@ export async function saveGratitude(
         where: {
           userId_entryDate_position: { userId, entryDate, position: idx + 1 },
         },
-        create: { userId, entryDate, position: idx + 1, content },
-        update: { content },
+        create: { userId, entryDate, position: idx + 1, content: encrypt(content) },
+        update: { content: encrypt(content) },
       }),
     ),
   );

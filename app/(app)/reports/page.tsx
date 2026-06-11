@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
 import { formatDateOnly } from "@/lib/format";
 import { GenerateReportButton } from "@/components/generate-report-button";
+import { decrypt } from "@/lib/crypto";
 
 export default async function ReportsPage() {
   const userId = await requireUserId();
@@ -35,7 +36,7 @@ export default async function ReportsPage() {
             <p className="mb-2 text-xs font-medium text-neutral-500">
               Week of {formatDateOnly(report.weekStart)}
             </p>
-            <div className="whitespace-pre-wrap text-sm leading-relaxed">{report.content}</div>
+            <div className="whitespace-pre-wrap text-sm leading-relaxed">{decrypt(report.content)}</div>
           </article>
         ))
       )}

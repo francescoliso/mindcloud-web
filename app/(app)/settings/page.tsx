@@ -32,6 +32,21 @@ export default async function SettingsPage() {
       </section>
 
       <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-neutral-500">Your data</h2>
+        <p className="text-sm text-neutral-500">
+          Download everything you&apos;ve written — journal, gratitude, moods, and reports — as a
+          JSON file.
+        </p>
+        <a
+          href="/api/export"
+          download
+          className="inline-flex rounded-full border border-sky-300 px-4 py-2 text-sm font-medium text-sky-700 transition hover:bg-sky-50 dark:border-sky-900 dark:text-sky-300 dark:hover:bg-sky-950/30"
+        >
+          Export my data
+        </a>
+      </section>
+
+      <section className="space-y-3">
         <h2 className="text-sm font-semibold text-rose-600">Danger zone</h2>
         <DeleteAccount />
       </section>

@@ -5,6 +5,7 @@ import { MoodCheckin } from "@/components/mood-checkin";
 import { deleteJournalEntry } from "@/actions/journal";
 import { formatDateTime } from "@/lib/format";
 import { localDateOnlyUTC } from "@/lib/week";
+import { decrypt } from "@/lib/crypto";
 
 export default async function JournalPage() {
   const userId = await requireUserId();
@@ -50,7 +51,7 @@ export default async function JournalPage() {
                   </button>
                 </form>
               </div>
-              <p className="whitespace-pre-wrap text-sm leading-relaxed">{entry.content}</p>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed">{decrypt(entry.content)}</p>
             </article>
           ))
         )}

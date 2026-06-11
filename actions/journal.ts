@@ -3,13 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
+import { encrypt } from "@/lib/crypto";
 
 export async function createJournalEntry(formData: FormData): Promise<void> {
   const userId = await requireUserId();
   const content = String(formData.get("content") ?? "").trim();
   if (!content) return;
 
-  await prisma.journalEntry.create({ data: { userId, content } });
+  await prisma.journalEntry.create({ data: { userId, content: encrypt(content) } });
   revalidatePath("/journal");
 }
 

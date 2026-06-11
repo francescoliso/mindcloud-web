@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
 import { weekStart as weekStartOf, localDateOnlyUTC } from "@/lib/week";
 import { weeklyReportPrompt, completeWeeklyReport } from "@/lib/claude";
+import { encrypt, decrypt } from "@/lib/crypto";
 
 export type ReportState = { error?: string; ok?: boolean };
 
@@ -33,16 +34,16 @@ export async function generateReport(
     ]);
 
     const prompt = weeklyReportPrompt(
-      entries.map((e) => ({ content: e.content, createdAt: e.createdAt })),
-      gratitude.map((g) => ({ content: g.content })),
+      entries.map((e) => ({ content: decrypt(e.content), createdAt: e.createdAt })),
+      gratitude.map((g) => ({ content: decrypt(g.content) })),
       moods.map((m) => ({ score: m.score, entryDate: m.entryDate })),
     );
     const content = await completeWeeklyReport(prompt);
 
     await prisma.weeklyReport.upsert({
       where: { userId_weekStart: { userId, weekStart: weekStartDate } },
-      create: { userId, weekStart: weekStartDate, content },
-      update: { content },
+      create: { userId, weekStart: weekStartDate, content: encrypt(content) },
+      update: { content: encrypt(content) },
     });
 
     revalidatePath("/reports");
