@@ -1,0 +1,52 @@
+name: Database Backup
+
+# Nightly logical backup of the production database, kept as a downloadable
+# workflow artifact (90-day retention). Belt-and-suspenders on top of Neon's
+# built-in point-in-time restore.
+#
+# Requires a repository secret BACKUP_DATABASE_URL = the Neon *unpooled*
+# connection string (Settings → Secrets → Actions). Until it's set, this
+# workflow no-ops gracefully.
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC daily
+  workflow_dispatch: {}
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for secret
+        id: gate
+        run: |
+          if [ -z "${{ secrets.BACKUP_DATABASE_URL }}" ]; then
+            echo "BACKUP_DATABASE_URL not set — skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install postgresql-client 17
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update && sudo apt-get install -y postgresql-client-17
+
+      - name: Dump database
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          mkdir -p backups
+          STAMP=$(date -u +%Y%m%d-%H%M%S)
+          pg_dump --no-owner --no-privileges --format=custom \
+            --file="backups/mindcloud-$STAMP.dump" "${{ secrets.BACKUP_DATABASE_URL }}"
+          ls -lh backups
+
+      - name: Upload artifact
+        if: steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup
+          path: backups/*.dump
+          retention-days: 90
