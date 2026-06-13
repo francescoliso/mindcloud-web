@@ -39,7 +39,7 @@ jobs:
         run: |
           mkdir -p backups
           STAMP=$(date -u +%Y%m%d-%H%M%S)
-          pg_dump --no-owner --no-privileges --format=custom \
+          /usr/lib/postgresql/17/bin/pg_dump --no-owner --no-privileges --format=custom \
             --file="backups/mindcloud-$STAMP.dump" "${{ secrets.BACKUP_DATABASE_URL }}"
           ls -lh backups
 
