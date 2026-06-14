@@ -2,7 +2,9 @@ import { prisma } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
 
 export default async function AdminUsersPage() {
+  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
   const users = await prisma.user.findMany({
+    where: adminEmail ? { email: { not: adminEmail } } : undefined,
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
