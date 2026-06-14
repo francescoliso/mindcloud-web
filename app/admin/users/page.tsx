@@ -3,24 +3,29 @@ import { formatDateTime } from "@/lib/format";
 
 export default async function AdminUsersPage() {
   const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
-  const users = await prisma.user.findMany({
-    where: adminEmail ? { email: { not: adminEmail } } : undefined,
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      email: true,
-      createdAt: true,
-      onboardedAt: true,
-      _count: {
-        select: {
-          journalEntries: true,
-          gratitudeItems: true,
-          weeklyReports: true,
-          moodEntries: true,
+  const [adminUser, users] = await Promise.all([
+    adminEmail
+      ? prisma.user.findUnique({ where: { email: adminEmail }, select: { email: true, createdAt: true } })
+      : null,
+    prisma.user.findMany({
+      where: adminEmail ? { email: { not: adminEmail } } : undefined,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+        onboardedAt: true,
+        _count: {
+          select: {
+            journalEntries: true,
+            gratitudeItems: true,
+            weeklyReports: true,
+            moodEntries: true,
+          },
         },
       },
-    },
-  });
+    }),
+  ]);
 
   const onboarded = users.filter((u) => u.onboardedAt).length;
 
@@ -33,6 +38,23 @@ export default async function AdminUsersPage() {
         </p>
       </div>
 
+      {adminUser && (
+        <section>
+          <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-neutral-400">Admin</h2>
+          <div className="card-soft flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">{adminUser.email}</p>
+              <p className="text-xs text-neutral-400">Since {formatDateTime(adminUser.createdAt)}</p>
+            </div>
+            <span className="shrink-0 rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700 dark:bg-sky-950/40 dark:text-sky-300">
+              admin
+            </span>
+          </div>
+        </section>
+      )}
+
+      <section>
+        <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-neutral-400">Members</h2>
       {users.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-sky-200 p-6 text-center text-sm text-neutral-500 dark:border-sky-900">
           No registered users yet. Invite people from the Waitlist tab.
@@ -69,6 +91,7 @@ export default async function AdminUsersPage() {
           ))}
         </ul>
       )}
+      </section>
     </div>
   );
 }
