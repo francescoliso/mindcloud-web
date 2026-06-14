@@ -54,7 +54,7 @@ export function AuthForm({ mode, action }: { mode: "login" | "signup"; action: A
           <p className="mt-5 text-sm text-neutral-500">
             Don&apos;t have an account?{" "}
             <Link href="/" className="font-medium text-sky-500 hover:underline">
-              Join the waitlist
+              Join the waitlist to get access
             </Link>
           </p>
         </div>
