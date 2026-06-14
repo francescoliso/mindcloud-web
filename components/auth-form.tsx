@@ -18,16 +18,6 @@ export function AuthForm({ mode, action }: { mode: "login" | "signup"; action: A
       </div>
 
       <div className="relative w-full max-w-sm">
-        <Link
-          href="/"
-          className="mb-4 flex items-center gap-1.5 text-sm text-neutral-400 transition hover:text-sky-400"
-        >
-          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M10 12L6 8l4-4" />
-          </svg>
-          Back to home
-        </Link>
-
         <div className="card-soft text-center">
           <Logo className="mx-auto mb-3 h-14 w-auto" />
           <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
@@ -51,11 +41,12 @@ export function AuthForm({ mode, action }: { mode: "login" | "signup"; action: A
             </button>
           </form>
 
-          <p className="mt-5 text-sm text-neutral-500">
+          <p className="mt-5 text-sm text-neutral-400">
             Don&apos;t have an account?{" "}
-            <Link href="/" className="font-medium text-sky-500 hover:underline">
-              Join the waitlist to get access
+            <Link href="/" className="font-medium text-sky-400 hover:underline">
+              Join the waitlist
             </Link>
+            <span className="text-white"> to get access</span>
           </p>
         </div>
       </div>
