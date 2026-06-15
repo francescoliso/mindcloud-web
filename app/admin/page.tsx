@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/db";
 
 export default async function AdminDashboardPage() {
+  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+  const excludeAdmin = adminEmail ? { email: { not: adminEmail } } : undefined;
+
   const [
     users,
     onboarded,
@@ -9,8 +12,8 @@ export default async function AdminDashboardPage() {
     waitlistInvited,
     waitlistRegistered,
   ] = await Promise.all([
-    prisma.user.count(),
-    prisma.user.count({ where: { onboardedAt: { not: null } } }),
+    prisma.user.count({ where: excludeAdmin }),
+    prisma.user.count({ where: { onboardedAt: { not: null }, ...excludeAdmin } }),
     prisma.accountDeletion.count(),
     prisma.waitlistEntry.count({ where: { status: "PENDING" } }),
     prisma.waitlistEntry.count({ where: { status: "INVITED" } }),
