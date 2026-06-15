@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 
-const USER_ROUTES = ["/journal", "/gratitude", "/reports", "/settings", "/welcome"];
+const USER_ROUTES = ["/journal", "/gratitude", "/wheel", "/reports", "/settings", "/welcome"];
 const ADMIN_ROUTES = ["/admin"];
 
 function isAdmin(email?: string | null): boolean {

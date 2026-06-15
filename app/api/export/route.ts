@@ -11,7 +11,7 @@ export async function GET() {
   const userId = await requireUserId();
   const session = await auth();
 
-  const [user, journal, gratitude, moods, reports] = await Promise.all([
+  const [user, journal, gratitude, moods, reports, wheel] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: { email: true, createdAt: true, onboardedAt: true },
@@ -23,6 +23,7 @@ export async function GET() {
     }),
     prisma.moodEntry.findMany({ where: { userId }, orderBy: { entryDate: "asc" } }),
     prisma.weeklyReport.findMany({ where: { userId }, orderBy: { weekStart: "asc" } }),
+    prisma.lifeWheel.findUnique({ where: { userId } }),
   ]);
 
   const payload = {
@@ -36,6 +37,7 @@ export async function GET() {
     })),
     moods: moods.map((m) => ({ score: m.score, entryDate: m.entryDate })),
     weeklyReports: reports.map((r) => ({ content: decrypt(r.content), weekStart: r.weekStart })),
+    lifeWheel: wheel ? { goals: wheel.goals, current: wheel.current, updatedAt: wheel.updatedAt } : null,
   };
 
   const date = new Date().toISOString().slice(0, 10);
