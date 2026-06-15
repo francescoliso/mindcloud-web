@@ -21,6 +21,12 @@ const features = [
     preview: "○ Morning coffee in the sun\n○ A good conversation\n○ Finally shipped the thing",
   },
   {
+    emoji: "🕸️",
+    title: "Life Wheel",
+    body: "Set goals across eight dimensions of your life and see where you stand today.",
+    preview: "Work 6→9 · Love 7→9 · Health 5→8\nFriendship 7→8 · Finance 4→7…",
+  },
+  {
     emoji: "📊",
     title: "Weekly reflection",
     body: "A warm, AI-written summary of your week's mood and recurring themes.",
@@ -84,12 +90,12 @@ export default function Home() {
         <div className="mx-auto w-full max-w-5xl py-16">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">What&apos;s inside</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Three habits. One calm space.
+            Everything you need. Nothing you don&apos;t.
           </h2>
           <p className="mt-2 max-w-md text-sm text-neutral-500">
-            Everything you need to check in with yourself daily — nothing you don&apos;t.
+            Four tools to check in with yourself — daily and over time.
           </p>
-          <div className="mt-10 grid gap-5 sm:grid-cols-3">
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((f) => (
               <div key={f.title} className="card-soft flex flex-col gap-3 text-left">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-xl dark:bg-sky-950/50">
