@@ -23,7 +23,7 @@ export async function sendWaitlistConfirmation(to: string): Promise<void> {
     "You're on the MindCloud waitlist",
     `<p>Thanks for joining the <strong>MindCloud</strong> waitlist.</p>
      <p>MindCloud is a private space for journaling, gratitude, and weekly reflections.
-     We'll email you an invite when your spot opens up.</p>
+     The founder will review your request and send you a personal invite to join.</p>
      <p style="color:#6b7280;font-size:13px">mindcloud.space · Private by design · Your words stay yours.</p>`,
   );
 }
@@ -35,7 +35,7 @@ export async function sendInvite(to: string, link: string): Promise<void> {
     `<p>You're invited to <strong>MindCloud</strong> — a private space for journaling, gratitude, and weekly reflections.</p>
      <p><a href="${link}" style="display:inline-block;padding:10px 20px;background:#0284c7;color:#fff;border-radius:8px;text-decoration:none">Create your account</a></p>
      <p style="color:#6b7280;font-size:13px">Or paste this link:<br>${link}</p>
-     <p style="color:#6b7280;font-size:13px">This invite expires in 30 days.</p>
+     <p style="color:#6b7280;font-size:13px">This invite expires in 7 days.</p>
      <p style="color:#6b7280;font-size:13px">mindcloud.space · Private by design · Your words stay yours.</p>`,
   );
 }

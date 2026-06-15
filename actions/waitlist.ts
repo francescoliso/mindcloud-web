@@ -36,7 +36,7 @@ export async function joinWaitlist(
 
   await prisma.waitlistEntry.create({ data: { email } });
   await sendWaitlistConfirmation(email);
-  return { ok: true, message: "You're on the list! We'll email you when your invite is ready." };
+  return { ok: true, message: "You're on the waitlist! The founder will review your request and send you an invite to join." };
 }
 
 // Admin: approve a pending entry, generate an invite token, and email the link.
@@ -55,7 +55,7 @@ export async function approveAndInvite(formData: FormData): Promise<void> {
       status: "INVITED",
       inviteToken: token,
       invitedAt: new Date(),
-      tokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      tokenExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
   });
 
