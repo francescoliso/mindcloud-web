@@ -4,81 +4,121 @@ Repo: https://github.com/francescoliso/mindcloud-web (private)
 
 > **Current state (June 2026):** every push to `main` auto-deploys via
 > **GitHub Actions** (`.github/workflows/deploy.yml`) to **mindcloud.space**.
-> One-time setup: add `VERCEL_TOKEN` as a GitHub secret (see step 1 below).
-> `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` are already set.
-
-## 1. One-time: add VERCEL_TOKEN to GitHub
-
-1. Go to **vercel.com → Account Settings → Tokens → Create**.
-2. Name: `github-actions`, Type: **Classic Token**, Expiration: as preferred.
-3. Copy the token.
-4. Go to **github.com/francescoliso/mindcloud-web → Settings → Secrets → Actions → New secret**.
-5. Name: `VERCEL_TOKEN`, Value: paste the token.
-
-After this, `git push origin main` triggers CI then deploys automatically.
+> `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` are already set as GitHub secrets.
 
 ---
 
-## Alternative: Vercel CLI (manual deploy)
-From `~/Desktop/mindcloud-web`:
-```bash
-vercel --prod
+## How deploys work
+
+```
+git push origin main
+  → CI: typecheck + lint + test + build
+  → Deploy: Vercel build (prisma migrate deploy + next build) → live on mindcloud.space
 ```
 
-## 2. Create the production database (Vercel Postgres)
-In the Vercel dashboard → your project → **Storage** → **Create Database** → **Postgres**.
-Connecting it auto-adds connection env vars to the project, including:
-- `DATABASE_URL` — **pooled** connection (use this for the app at runtime)
-- a non-pooled / direct URL (named `DATABASE_URL_UNPOOLED` or `POSTGRES_URL_NON_POOLING`) — use this for migrations
+The `vercel-build` script in `package.json` runs `prisma migrate deploy && prisma generate && next build`, so schema migrations are applied automatically on every deploy.
 
-If Prisma's `DATABASE_URL` isn't set automatically, add it manually pointing at the **pooled** string.
+---
 
-## 3. Set the remaining env vars
-In Vercel → **Settings → Environment Variables (Production)**:
+## Production environment variables
 
-| Variable | Value |
+Set all of these in **Vercel → Settings → Environment Variables (Production)**:
+
+| Variable | Value / notes |
 |---|---|
-| `ANTHROPIC_API_KEY` | your Claude key (`sk-ant-…`) |
+| `DATABASE_URL` | Neon **pooled** connection string |
+| `DATABASE_URL_UNPOOLED` | Neon **direct/unpooled** connection string (used by Prisma for migrations) |
 | `AUTH_SECRET` | `openssl rand -base64 33` |
-| `ADMIN_EMAIL` | your email — bootstraps admin + `/admin/waitlist` access |
-| `APP_URL` | your `https://…vercel.app` URL (for invite links) |
-| `GMAIL_USER` | your Gmail address *(optional — for emails)* |
-| `GMAIL_APP_PASSWORD` | a 16-char Google App Password *(optional)* |
+| `ANTHROPIC_API_KEY` | Claude API key (`sk-ant-…`) |
+| `ADMIN_EMAIL` | `admin@mindcloud.space` — the only account that can access `/admin` |
+| `APP_URL` | `https://mindcloud.space` — used to build invite links |
+| `RESEND_API_KEY` | Resend API key (`re_…`) — domain `mindcloud.space` must be verified (DKIM + SPF) |
+| `ENCRYPTION_KEY` | `openssl rand -base64 32` — AES-256-GCM key for content at rest |
+| `CRON_SECRET` | Any long random string — guards `/api/cron/weekly-reports` |
 
-Email is optional: without `GMAIL_*`, invite links still appear (copyable) on the admin page.
-Changing env vars requires a **redeploy** to take effect.
+After adding or changing any env var, trigger a **redeploy** (Vercel → Deployments → Redeploy latest).
 
-## 4. Create the tables in the production DB (one time)
-Run the migration against the **direct/unpooled** connection string (pooled connections can stall on migration locks):
+---
+
+## GitHub secrets
+
+| Secret | Where used |
+|---|---|
+| `VERCEL_TOKEN` | `deploy.yml` — Vercel API token for remote builds |
+| `VERCEL_ORG_ID` | `deploy.yml` — already set |
+| `VERCEL_PROJECT_ID` | `deploy.yml` — already set |
+| `BACKUP_DATABASE_URL` | `backup.yml` — Neon **unpooled** string; nightly `pg_dump` is a no-op until this is set |
+
+---
+
+## Admin account setup
+
+The admin account is **not created via the registration UI** — it is inserted directly into the production database.
+
+1. Generate a bcrypt hash locally:
+   ```bash
+   node -e "const b=require('bcryptjs');b.hash('yourpassword',12).then(h=>console.log(h))"
+   ```
+2. In **Neon → SQL Editor**, run:
+   ```sql
+   INSERT INTO "User" (id, email, "passwordHash", "createdAt")
+   VALUES (gen_random_uuid(), 'admin@mindcloud.space', '<hash>', now());
+   ```
+3. Log in at `mindcloud.space/login` with those credentials → lands on `/admin`.
+
+The admin account is excluded from the `/admin/users` list and cannot access any user routes (`/journal`, `/gratitude`, `/wheel`, etc.).
+
+---
+
+## Nightly database backups
+
+`.github/workflows/backup.yml` runs `pg_dump` daily at 03:00 UTC and uploads the dump as a GitHub Actions artifact (90-day retention).
+
+- Requires the `BACKUP_DATABASE_URL` GitHub secret (Neon unpooled connection string).
+- Uses `/usr/lib/postgresql/17/bin/pg_dump` explicitly (Neon runs PG 17; the runner's default `pg_dump` is v16).
+- The workflow **no-ops gracefully** if the secret is not set.
+- Belt-and-suspenders on top of Neon's built-in point-in-time restore.
+
+---
+
+## Cron job (weekly reports)
+
+`vercel.json` schedules `/api/cron/weekly-reports` every **Monday at 08:00 UTC**.
+
+- Vercel sends `Authorization: Bearer <CRON_SECRET>` automatically.
+- The route generates a weekly reflection for every user who had activity in the past week.
+- `CRON_SECRET` must match in both Vercel env vars and the codebase.
+
+---
+
+## Email (Resend)
+
+- Sender: `hello@mindcloud.space`
+- Domain verified in Resend dashboard (DKIM + SPF → both **Verified**).
+- `RESEND_API_KEY` must be set in Vercel env vars.
+- Test locally: `npm run email:test you@example.com` (requires `RESEND_API_KEY` in `.env`).
+- Without the key, emails fall back to `console.log` and invite links remain usable via the admin UI copy button.
+
+---
+
+## Smoke test after a fresh deploy
+
+1. Open `https://mindcloud.space` → landing page loads with waitlist form.
+2. Log in as `admin@mindcloud.space` → lands on `/admin`, not `/journal`.
+3. `/admin/users` → shows Members section (admin card excluded from Members).
+4. `/admin/waitlist` → join the waitlist with a test email at `/`, then Approve & invite → copy the invite link.
+5. Open the invite link → set a password → account created → `/welcome` onboarding → `/journal`.
+6. Write a journal entry, fill gratitude, set mood → all save.
+7. Open `/wheel` → set up Life Wheel → radar chart renders.
+8. Settings → Export my data → JSON downloads with readable (decrypted) content.
+9. Settings → Dark mode → toggles and persists across reload.
+10. Open `/admin` in incognito → redirects away (not accessible to non-admins).
+
+---
+
+## Manual deploy (emergency / CLI)
+
 ```bash
-vercel env pull .env.production.local          # fetches the DB URLs locally
-# then, using the unpooled URL from that file:
-DATABASE_URL="<UNPOOLED_URL>" npx prisma migrate deploy
-```
-
-## 5. (Optional) Migrate your old Supabase data
-With `SUPABASE_SERVICE_ROLE_KEY`, `MIGRATE_USER_EMAIL`, `MIGRATE_USER_PASSWORD`, and the prod
-`DATABASE_URL` set in `.env`:
-```bash
-npm run migrate:supabase
-```
-
-## 6. Deploy
-```bash
+cd ~/Desktop/mindcloud-web
 vercel --prod
 ```
-
-Vercel runs `vercel-build` (`prisma generate && next build`). On success it prints your live URL.
-
-## Smoke test the deployment
-1. Open the URL → the **landing page** with a waitlist form.
-2. **Bootstrap admin:** go to `/signup`, register with the `ADMIN_EMAIL` address → you land on `/welcome` (onboarding) → "Start journaling".
-3. Visit `/admin/waitlist` → join the waitlist with another email at `/`, then **Approve & invite** it → open the copied invite link → set a password → account created.
-4. Journal: add an entry + tap a mood. Gratitude: fill all three → it locks for the day.
-5. Reports: **Generate this week** → a report appears (needs `ANTHROPIC_API_KEY`).
-6. (If email configured) `npm run email:test you@addr` sends a test via Gmail SMTP.
-
-## Notes
-- `vercel-build` is set so the Prisma client is regenerated on every deploy.
-- Secrets live only in Vercel env vars and the gitignored local `.env` — never in the bundle.
-- Future schema changes: `prisma migrate dev` locally → commit → `prisma migrate deploy` against prod.
