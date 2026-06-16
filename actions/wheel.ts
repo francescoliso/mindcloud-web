@@ -18,9 +18,10 @@ export async function saveLifeWheel(_: unknown, formData: FormData) {
 
   for (const key of DIMENSION_KEYS) {
     goals[key] = parseScore(formData.get(`goal_${key}`));
+    const comment = String(formData.get(`comment_${key}`) ?? "").trim().slice(0, 1000);
     current[key] = {
       score:   parseScore(formData.get(`score_${key}`)),
-      comment: String(formData.get(`comment_${key}`) ?? "").trim(),
+      comment,
     };
   }
 

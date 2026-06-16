@@ -55,10 +55,23 @@ export async function signup(_prev: AuthState, formData: FormData): Promise<Auth
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) return { error: "An account with that email already exists." };
+  if (existing) return { error: "This email cannot be used. It may already be registered." };
+
+  const firstName   = String(formData.get("firstName")   ?? "").trim() || null;
+  const lastName    = String(formData.get("lastName")    ?? "").trim() || null;
+  const dobRaw      = String(formData.get("dateOfBirth") ?? "").trim();
+  let dateOfBirth: Date | null = null;
+  if (dobRaw) {
+    const dob = new Date(dobRaw);
+    const age = new Date().getFullYear() - dob.getFullYear();
+    if (isNaN(dob.getTime()) || age < 13 || age > 120) {
+      return { error: "Please enter a valid date of birth." };
+    }
+    dateOfBirth = dob;
+  }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.create({ data: { email, passwordHash } });
+  await prisma.user.create({ data: { email, passwordHash, firstName, lastName, dateOfBirth } });
   if (invitedEntryId) {
     await prisma.waitlistEntry.update({ where: { id: invitedEntryId }, data: { status: "REGISTERED" } });
   }

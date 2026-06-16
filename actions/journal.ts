@@ -9,6 +9,7 @@ export async function createJournalEntry(formData: FormData): Promise<void> {
   const userId = await requireUserId();
   const content = String(formData.get("content") ?? "").trim();
   if (!content) return;
+  if (content.length > 50000) return;
 
   // Parse comma-separated tags into a clean, de-duped, lowercased list.
   const tags = Array.from(

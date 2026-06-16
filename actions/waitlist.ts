@@ -48,7 +48,7 @@ export async function approveAndInvite(formData: FormData): Promise<void> {
   const entry = await prisma.waitlistEntry.findUnique({ where: { id } });
   if (!entry) return;
 
-  const token = randomBytes(24).toString("hex");
+  const token = randomBytes(32).toString("hex");
   await prisma.waitlistEntry.update({
     where: { id },
     data: {

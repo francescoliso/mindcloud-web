@@ -12,7 +12,19 @@ function isAdmin(email?: string | null): boolean {
 // auth instance. The Credentials provider is added in auth.ts (Node runtime).
 export const authConfig = {
   pages: { signIn: "/login" },
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 24 * 60 * 60 },
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax" as const,
+        path: "/",
+        maxAge: 24 * 60 * 60,
+      },
+    },
+  },
   providers: [],
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {

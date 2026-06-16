@@ -23,6 +23,9 @@ export async function saveGratitude(
   if (items.some((t) => t.length === 0)) {
     return { error: "Please fill in all three before saving." };
   }
+  if (items.some((t) => t.length > 500)) {
+    return { error: "Each item must be under 500 characters." };
+  }
 
   await prisma.$transaction(
     items.map((content, idx) =>

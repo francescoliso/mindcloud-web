@@ -28,6 +28,33 @@ export function SignupForm({
         <form action={action} className="mt-6 space-y-3 text-left">
           {token && <input type="hidden" name="token" value={token} />}
 
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              id="firstName" name="firstName" type="text"
+              autoComplete="given-name" required
+              aria-label="First name" placeholder="First name"
+              className="input-soft"
+            />
+            <input
+              id="lastName" name="lastName" type="text"
+              autoComplete="family-name" required
+              aria-label="Last name" placeholder="Last name"
+              className="input-soft"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="dateOfBirth" className="px-1 text-xs text-neutral-500">
+              Date of birth
+            </label>
+            <input
+              id="dateOfBirth" name="dateOfBirth" type="date"
+              autoComplete="bday" required
+              aria-label="Date of birth"
+              className="input-soft"
+            />
+          </div>
+
           <input
             id="email" name="email" type="email" required
             defaultValue={email} readOnly={invited} autoComplete="email"

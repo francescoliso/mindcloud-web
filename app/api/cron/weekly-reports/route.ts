@@ -8,11 +8,13 @@ export const maxDuration = 300;
 // Cron sends it as a Bearer token automatically.
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${secret}`) {
-      return new Response("Unauthorized", { status: 401 });
-    }
+  if (!secret) {
+    console.error("[cron] CRON_SECRET is not set — endpoint is unprotected, refusing to run.");
+    return new Response("CRON_SECRET not configured", { status: 500 });
+  }
+  const auth = request.headers.get("authorization");
+  if (auth !== `Bearer ${secret}`) {
+    return new Response("Unauthorized", { status: 401 });
   }
 
   const userIds = await usersWithWeeklyActivity();

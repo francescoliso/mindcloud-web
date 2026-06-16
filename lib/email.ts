@@ -10,11 +10,11 @@ const resend = process.env.RESEND_API_KEY
 // invite links remain recoverable from server logs and the admin UI copy button.
 async function send(to: string, subject: string, html: string): Promise<void> {
   if (!resend) {
-    console.log(`[email:dev] to=${to} subject="${subject}"\n${html}\n`);
+    console.log(`[email:dev] to=${to} subject="${subject}" bodyLength=${html.length}`);
     return;
   }
   const { error } = await resend.emails.send({ from: FROM, to, subject, html });
-  if (error) console.error("[email] send failed:", error);
+  if (error) console.error("[email] send failed:", (error as { message?: string }).message ?? String(error));
 }
 
 export async function sendWaitlistConfirmation(to: string): Promise<void> {
