@@ -6,7 +6,10 @@ A small, private, **invite-only** web app for mental wellbeing.
 - **🙏 Gratitude** — three things you're grateful for, **once per day**. Completing a day locks it read-only.
 - **🕸️ Life Wheel** — a radar chart mapping **goal vs. now** across 8 fixed life dimensions (Work, Love, Friendship, Family, Health, Mind, Finance, Growth), with a comment per dimension. Live chart preview while editing.
 - **📊 Weekly Reports** — a warm, AI-written reflection (via Claude) on the week's journal, mood, and gratitude.
-- **🚪 Waitlist + onboarding** — a public landing page collects waitlist signups; the admin approves people, who then get an invite link; new users go through a short guided onboarding.
+- **🚪 Waitlist + onboarding** — a public landing page collects waitlist signups; the admin approves people, who then get an invite link (7-day expiry); new users go through a short guided onboarding.
+- **📬 Contact** — landing page contact form (name, email, message → delivered to admin inbox without exposing admin address).
+- **💬 Feedback** — in-app feedback form in Settings → sends improvement ideas directly to admin.
+- **🔑 Forgot password** — secure reset flow: 15-min single-use token, SHA-256 hashed at rest, delivered by email.
 
 ---
 
@@ -16,7 +19,7 @@ A small, private, **invite-only** web app for mental wellbeing.
 Browser ──► Next.js app on Vercel ──► PostgreSQL (Neon)
                   │
                   ├──► Anthropic API (Claude Haiku)  ← weekly reports only
-                  └──► Resend API                     ← waitlist / invite / deletion emails
+                  └──► Resend API                     ← all transactional email
 ```
 
 - The **Next.js app** serves the UI *and* the server logic — there is no separate backend.
@@ -35,7 +38,7 @@ Browser ──► Next.js app on Vercel ──► PostgreSQL (Neon)
 | Styling | **Tailwind CSS v4** | Utility classes; no separate config file |
 | Database | **PostgreSQL** | **Neon** in production, local Postgres in dev |
 | ORM | **Prisma 6** | Type-safe DB access + migrations |
-| Auth | **Auth.js v5** (NextAuth) | Email + password, `bcryptjs`, JWT sessions, **invite-only** |
+| Auth | **Auth.js v5** (NextAuth) | Email + password, `bcryptjs`, JWT sessions (24h), **invite-only** |
 | AI | **Anthropic SDK** (`claude-haiku-4-5`) | Server-side only |
 | Email | **Resend** (`resend` SDK) | From `hello@mindcloud.space` via DKIM/SPF; logs to console if `RESEND_API_KEY` unset |
 | Hosting | **Vercel** | Auto-deploys from GitHub (`main` → production); see [DEPLOY.md](./DEPLOY.md) |
@@ -48,9 +51,9 @@ Browser ──► Next.js app on Vercel ──► PostgreSQL (Neon)
 ## Access model (invite-only)
 
 1. A visitor joins the **waitlist** on the landing page (`/`).
-2. The **admin** (`ADMIN_EMAIL`) opens **`/admin/waitlist`**, clicks **Approve & invite** — this generates an invite link (`/signup?token=…`), emails it, and shows a copyable link.
-3. The invitee opens the link, sets a password, and an account is created. Signup is refused without a valid token.
-4. New users pass through **`/welcome`** (guided onboarding) once, tracked by `User.onboardedAt`.
+2. The **admin** (`ADMIN_EMAIL`) opens **`/admin/waitlist`**, clicks **Approve & invite** — this generates an invite link (`/signup?token=…`, 7-day expiry), emails it, and shows a copyable link.
+3. The invitee opens the link, fills in first name, last name, date of birth, email, and password — an account is created. Signup is refused without a valid token.
+4. New users pass through **`/welcome`** (feature overview) once, tracked by `User.onboardedAt`.
 
 **Admin and user accounts are fully separate.** The admin account (`ADMIN_EMAIL`) can only access `/admin/*` and is redirected away from all user routes. Regular users cannot access `/admin`. The admin is pre-inserted directly into the DB — no registration UI needed.
 
@@ -62,27 +65,43 @@ Email is optional: if `RESEND_API_KEY` isn't set, emails log to the server conso
 
 ```
 app/
-  page.tsx                        Public landing page + waitlist form (scroll-snap sections)
-  (auth)/login                    Sign-in page (dark slate background + soft glow)
-  (auth)/signup                   Invite-aware sign-up (token required; plain card)
+  page.tsx                        Public landing page (scroll-snap: hero, features, privacy, contact, story)
+  (auth)/login                    Sign-in page (dark slate background + soft glow, "Forgot password?" link)
+  (auth)/signup                   Invite-aware sign-up (first name, last name, DOB, email, password)
+  (auth)/forgot-password          Request a password reset link (rate-limited, email-based)
+  (auth)/reset-password           Set a new password via token (15-min expiry, single-use, SHA-256 hashed)
   (app)/layout.tsx                Authed shell (frosted nav, logo, sign out, onboarding gate)
   (app)/journal                   Journal + mood check-in; supports ?q= search and ?tag= filter
   (app)/gratitude                 Gratitude page (once-per-day hard lock)
   (app)/wheel                     Life Wheel — radar chart, goals vs now, 8 fixed dimensions
   (app)/reports                   Weekly reports page
-  (app)/settings                  Appearance (dark mode), data export, danger zone (account deletion)
-  welcome/                        Guided first-run onboarding
+  (app)/settings                  Appearance, data export, feedback form, danger zone (account deletion)
+  welcome/                        Guided first-run onboarding (static feature cards)
   admin/                          Admin dashboard (stats + churn) — gated to ADMIN_EMAIL
   admin/users/                    Admin: list all users (admin excluded) + per-user stats
   admin/waitlist/                 Admin: approve & invite
   api/auth/[...nextauth]          Auth.js HTTP handler
   api/version                     Returns Vercel deployment id (for self-update)
   api/export                      GET → decrypted JSON download of all user data
-  api/cron/weekly-reports         POST (cron) → pre-generates reports for active users
-actions/                          Server Actions: auth, journal, gratitude, mood, reports, wheel, waitlist, account, onboarding
+  api/cron/weekly-reports         GET (cron) → pre-generates reports for active users
+actions/
+  auth.ts                         login, signup (invite-only; validates DOB age 13–120)
+  password-reset.ts               requestPasswordReset, resetPassword
+  contact.ts                      sendContactMessage (landing page → admin inbox)
+  feedback.ts                     sendFeedback (in-app Settings → admin inbox)
+  journal.ts                      createJournalEntry (50k char limit), deleteJournalEntry
+  gratitude.ts                    saveGratitude (500 char/item limit)
+  mood.ts                         saveMood
+  wheel.ts                        saveLifeWheel (1k char/comment limit)
+  waitlist.ts                     joinWaitlist, approveAndInvite (32-byte tokens)
+  account.ts                      deleteAccount
+  onboarding.ts                   finishOnboarding
+  reports.ts                      generateReport
 components/
-  auth-form.tsx                   Login form (dark slate background + soft glow)
-  signup-form.tsx                 Signup form (invite-only, plain card)
+  auth-form.tsx                   Login form (dark slate, "Forgot password?" link)
+  signup-form.tsx                 Signup form (first name, last name, DOB, email, password)
+  contact-form.tsx                Landing page contact form (name, email, message)
+  feedback-form.tsx               In-app feedback textarea (Settings page)
   logo.tsx                        Brand mark (brain hemispheres, mood gradient)
   auto-refresh.tsx                Polls api/version, reloads the app on a new deploy
   theme-toggle.tsx                Light/dark pill; persists to localStorage, no-flash on load
@@ -97,14 +116,15 @@ lib/
   db.ts                           Prisma client (singleton)
   session.ts / admin.ts           requireUserId() / requireAdmin()
   claude.ts                       Weekly-report prompt + Anthropic call
-  email.ts                        Resend wrapper — from hello@mindcloud.space (console fallback)
+  email.ts                        Resend wrapper — waitlist, invite, password reset, contact, feedback, deletion
   crypto.ts                       AES-256-GCM encrypt/decrypt with enc:v1: prefix + plaintext fallback
   rate-limit.ts                   Postgres-backed fixed-window rate limiter (fail-open)
   reports.ts                      generateWeeklyReport() + usersWithWeeklyActivity()
   dimensions.ts                   Fixed Life Wheel dimension constants + TypeScript types
   mood.ts, week.ts, format.ts     Helpers
-auth.ts / auth.config.ts          Auth.js instance / edge-safe config (admin vs user route split)
+auth.ts / auth.config.ts          Auth.js instance / edge-safe config (admin vs user route split, 24h JWT)
 proxy.ts                          Route protection (Next 16's renamed "middleware")
+next.config.ts                    HTTP security headers (CSP, HSTS, X-Frame-Options, etc.)
 prisma/schema.prisma              Database schema
 test/                             Vitest unit tests: crypto.test.ts, week.test.ts, mood.test.ts
 scripts/                          migrate-from-supabase.ts, send-test-email.ts
@@ -119,15 +139,16 @@ vercel.json                       Vercel Cron: /api/cron/weekly-reports every Mo
 
 | Table | Key fields | Notes |
 |---|---|---|
-| `User` | email (unique), passwordHash, **onboardedAt** | `onboardedAt` null ⇒ show onboarding |
-| `JournalEntry` | content (encrypted), tags `String[]`, createdAt | tags are plaintext so SQL-filterable |
+| `User` | email (unique), passwordHash, firstName, lastName, dateOfBirth, **onboardedAt** | `onboardedAt` null ⇒ show onboarding |
+| `JournalEntry` | content (encrypted), tags `String[]`, createdAt | tags are plaintext so SQL-filterable; max 50k chars |
 | `MoodEntry` | score (1–5), entryDate | unique (userId, entryDate) → one mood/day, editable |
-| `GratitudeItem` | content (encrypted), position (1–3), entryDate | unique (userId, entryDate, position) → 3/day |
+| `GratitudeItem` | content (encrypted), position (1–3), entryDate | unique (userId, entryDate, position) → 3/day; max 500 chars/item |
 | `WeeklyReport` | content (encrypted), weekStart | unique (userId, weekStart) → one/week |
-| `LifeWheel` | goals (Json), current (Json), userId (unique) | one row per user; goals = `{dim: score}`; current = `{dim: {score, comment}}` |
-| `WaitlistEntry` | email (unique), status, inviteToken | status: PENDING → INVITED → REGISTERED |
+| `LifeWheel` | goals (Json), current (Json), userId (unique) | one row per user; goals = `{dim: score}`; current = `{dim: {score, comment}}`; max 1k chars/comment |
+| `WaitlistEntry` | email (unique), status, inviteToken (64-char hex, 7-day expiry) | status: PENDING → INVITED → REGISTERED |
+| `PasswordResetToken` | email, tokenHash (SHA-256), expiresAt, usedAt | 15-min single-use reset tokens |
 | `AccountDeletion` | accountCreatedAt, wasOnboarded, deletedAt | PII-free churn row written on deletion |
-| `RateLimit` | key (PK), count, windowEnd | fixed-window counter for waitlist / login / signup |
+| `RateLimit` | key (PK), count, windowEnd | fixed-window counter per endpoint + IP |
 
 ---
 
@@ -156,13 +177,12 @@ Open http://localhost:3000. Set `ADMIN_EMAIL` in `.env`, then insert the admin u
 | `DATABASE_URL_UNPOOLED` | Neon direct URL for migrations (locally mirror `DATABASE_URL`) |
 | `AUTH_SECRET` | Session signing secret — `openssl rand -base64 33` |
 | `ANTHROPIC_API_KEY` | Claude API key (`sk-ant-…`) — weekly reports only |
-| `ADMIN_EMAIL` | Admin account email — **only** this account can access `/admin` |
-| `APP_URL` | Base URL for invite links (`http://localhost:3000` dev / `https://mindcloud.space` prod) |
+| `ADMIN_EMAIL` | Admin account email — **only** this account can access `/admin`; also receives contact + feedback emails |
+| `APP_URL` | Base URL for invite and reset links (`http://localhost:3000` dev / `https://mindcloud.space` prod) |
 | `RESEND_API_KEY` | Resend API key — emails log to console if unset |
 | `ENCRYPTION_KEY` | Base64 of 32 random bytes (`openssl rand -base64 32`) — encrypts content at rest |
-| `CRON_SECRET` | Bearer token guarding `/api/cron/weekly-reports` |
+| `CRON_SECRET` | Bearer token guarding `/api/cron/weekly-reports`; endpoint returns 500 if unset |
 | `BACKUP_DATABASE_URL` | Neon unpooled URL — add as a **GitHub secret** to activate nightly backups |
-| `SUPABASE_*`, `MIGRATE_*` | Only for the one-off Supabase import script |
 
 ### npm scripts
 
@@ -189,15 +209,20 @@ Every push to `main` deploys automatically. Full guide in **[DEPLOY.md](./DEPLOY
 - **Next.js 16 renamed "middleware" to `proxy.ts`** — route protection lives there (must export a function).
 - **Prisma pinned to v6** — v7 dropped the `url` field; v6 keeps the simpler approach.
 - **No component library** — plain Tailwind, to avoid tooling friction on Next 16 / Tailwind v4.
-- **Admin/user separation** — `auth.config.ts` splits `USER_ROUTES` and `ADMIN_ROUTES`; middleware redirects each role to its correct home. Admin is inserted directly into the DB, never via the registration UI. Admin account is excluded from the `/admin/users` list.
+- **Admin/user separation** — `auth.config.ts` splits `USER_ROUTES` and `ADMIN_ROUTES`; middleware redirects each role to its correct home. Admin is inserted directly into the DB, never via the registration UI. Admin account is excluded from the `/admin/users` list and all dashboard counts.
+- **JWT sessions** expire after 24 hours; cookies have `httpOnly`, `secure` (production), and `sameSite: lax`.
+- **HTTP security headers** — `next.config.ts` sets CSP, HSTS (2-year preload), X-Frame-Options DENY, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy on every response.
+- **Forgot password** — `PasswordResetToken` stores a SHA-256 hash of the raw token (never the raw token). Tokens expire in 15 minutes and are marked used after a successful reset. Previous unused tokens for the same email are invalidated on each new request.
+- **Rate limiting** — Postgres-backed fixed-window (fail-open): waitlist 5/hr, login 10/10min, signup 10/10min, reset-request 5/hr, contact 3/hr, feedback 5/hr — all per IP.
+- **Content limits** — journal 50k chars, gratitude 500 chars/item, wheel comments 1k chars, contact/feedback 2k chars.
+- **Invite tokens** — 32 random bytes (256-bit) stored as a 64-char hex string; 7-day expiry; marked REGISTERED on use.
 - **Dates** stored as *UTC-midnight of the local calendar day* to avoid TZ off-by-one on daily locks.
-- **Email** — Resend from `hello@mindcloud.space`, DKIM + SPF verified. Sent on: waitlist join, invite, account deletion. Console fallback if key missing.
+- **Email** — Resend from `hello@mindcloud.space`, DKIM + SPF verified. Sent on: waitlist join, invite, password reset, contact message (→ admin), feedback (→ admin), account deletion.
 - **Encryption at rest** — AES-256-GCM via `lib/crypto.ts`. Format: `enc:v1:<iv>:<tag>:<ciphertext>`. Plaintext fallback for legacy rows. Tags stay plaintext so they're SQL-filterable.
 - **Life Wheel** — one JSON row per user (`LifeWheel`). 8 fixed dimensions in `lib/dimensions.ts`. Upserted on every save. SVG chart in `components/wheel-chart.tsx` — no chart library.
-- **Rate limiting** — Postgres-backed fixed-window (fail-open): waitlist 5/hr/IP, login 10/10min/IP, signup 10/10min/IP.
 - **Search & tags** — tags filter in SQL; free-text search decrypts in memory server-side (ciphertext blocks SQL LIKE).
 - **Account deletion** — cascades all personal data; PII-free `AccountDeletion` row feeds admin churn rate; confirmation email sent.
-- **Cron** — Vercel Cron runs `/api/cron/weekly-reports` Mondays 08:00 UTC; guarded by `CRON_SECRET`.
+- **Cron** — Vercel Cron runs `/api/cron/weekly-reports` Mondays 08:00 UTC; guarded by `CRON_SECRET`. Returns 500 (not 200) if `CRON_SECRET` is unset.
 - **Nightly backups** — `pg_dump` (explicit v17 path) at 03:00 UTC; 90-day GitHub artifact. Requires `BACKUP_DATABASE_URL` GitHub secret.
 - **Dark mode** — class-based; no-flash inline script in `<head>`; toggle in Settings → Appearance.
 - **Self-updating PWA** — `force-dynamic` + `AutoRefresh` keep the Dock web app current with each deploy.
