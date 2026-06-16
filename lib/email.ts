@@ -40,6 +40,49 @@ export async function sendInvite(to: string, link: string): Promise<void> {
   );
 }
 
+export async function sendPasswordReset(to: string, link: string): Promise<void> {
+  await send(
+    to,
+    "Reset your MindCloud password",
+    `<p>We received a request to reset your <strong>MindCloud</strong> password.</p>
+     <p><a href="${link}" style="display:inline-block;padding:10px 20px;background:#0284c7;color:#fff;border-radius:8px;text-decoration:none">Reset password</a></p>
+     <p style="color:#6b7280;font-size:13px">Or paste this link:<br>${link}</p>
+     <p style="color:#6b7280;font-size:13px">This link expires in 15 minutes. If you didn't request a reset, you can ignore this email.</p>
+     <p style="color:#6b7280;font-size:13px">mindcloud.space · Private by design · Your words stay yours.</p>`,
+  );
+}
+
+export async function sendContactEmail(opts: {
+  name: string;
+  email: string;
+  message: string;
+}): Promise<void> {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return;
+  await send(
+    adminEmail,
+    `MindCloud contact: ${opts.name}`,
+    `<p><strong>From:</strong> ${opts.name} &lt;${opts.email}&gt;</p>
+     <p><strong>Message:</strong></p>
+     <p style="white-space:pre-wrap">${opts.message}</p>`,
+  );
+}
+
+export async function sendFeedbackEmail(opts: {
+  userEmail: string;
+  message: string;
+}): Promise<void> {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) return;
+  await send(
+    adminEmail,
+    `MindCloud feedback from ${opts.userEmail}`,
+    `<p><strong>From:</strong> ${opts.userEmail}</p>
+     <p><strong>Message:</strong></p>
+     <p style="white-space:pre-wrap">${opts.message}</p>`,
+  );
+}
+
 export async function sendAccountDeleted(to: string): Promise<void> {
   await send(
     to,

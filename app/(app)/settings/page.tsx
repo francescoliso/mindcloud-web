@@ -3,6 +3,7 @@ import { requireUserId } from "@/lib/session";
 import { auth } from "@/auth";
 import { DeleteAccount } from "@/components/delete-account";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { FeedbackForm } from "@/components/feedback-form";
 import { formatDateOnly } from "@/lib/format";
 
 export default async function SettingsPage() {
@@ -50,6 +51,14 @@ export default async function SettingsPage() {
         >
           Export my data
         </a>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-neutral-500">Feedback</h2>
+        <p className="text-sm text-neutral-500">
+          Have an idea or spotted something? Let us know — every message is read.
+        </p>
+        <FeedbackForm />
       </section>
 
       <section className="space-y-3">

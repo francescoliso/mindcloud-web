@@ -3,6 +3,7 @@ import { WaitlistForm } from "@/components/waitlist-form";
 import { Logo } from "@/components/logo";
 import { SocialIcons } from "@/components/social-icons";
 import { AppPreview } from "@/components/app-preview";
+import { ContactForm } from "@/components/contact-form";
 
 // Always render fresh so a redeploy is reflected immediately (no ISR window).
 export const dynamic = "force-dynamic";
@@ -129,6 +130,20 @@ export default function Home() {
                 <p className="mt-1 text-xs text-neutral-500">{t.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section className="flex min-h-screen snap-start items-center border-t border-sky-100/70 px-6 dark:border-slate-800">
+        <div className="mx-auto w-full max-w-2xl py-16">
+          <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">Contact</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Get in touch.</h2>
+          <p className="mt-2 max-w-md text-sm text-neutral-500">
+            Questions, ideas, or just want to say hello — we read everything.
+          </p>
+          <div className="mt-8">
+            <ContactForm />
           </div>
         </div>
       </section>

@@ -63,6 +63,17 @@ model AccountDeletion {
   deletedAt        DateTime @default(now())
 }
 
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  email     String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+}
+
 // Fixed-window rate limiting (Postgres-backed, no external store).
 model RateLimit {
   key       String   @id

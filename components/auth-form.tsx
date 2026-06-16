@@ -39,6 +39,12 @@ export function AuthForm({ mode, action }: { mode: "login" | "signup"; action: A
             <button type="submit" disabled={pending} className="btn-soft w-full">
               {pending ? "Please wait…" : "Sign in"}
             </button>
+
+            <div className="text-right">
+              <Link href="/forgot-password" className="text-xs text-neutral-400 hover:text-sky-400">
+                Forgot password?
+              </Link>
+            </div>
           </form>
 
           <p className="mt-5 text-sm text-neutral-400">
